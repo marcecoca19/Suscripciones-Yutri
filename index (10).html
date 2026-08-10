@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Fichas Técnicas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --paper:#F3EEE6; --paper-card:#FBF8F2; --paper-dark:#EAE2D2;
+    --ink:#2A2420; --ink-soft:#5b5348; --brick:#C1440E; --sage:#5B6F4F;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Work Sans',sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 24px;}
+  .eyebrow{font-family:'Work Sans';font-size:11px;letter-spacing:2px;color:#8C6E4E;font-weight:700;}
+  .title{font-family:'Bebas Neue';font-size:44px;color:var(--ink);line-height:1;}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0;align-items:center;}
+  .tab{padding:8px 16px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid #2A242022;background:#EAE2D2;color:var(--ink);display:flex;align-items:center;gap:8px;}
+  .tab .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+  .tab.active{color:var(--paper);}
+  .tab-add{padding:8px 16px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;background:transparent;border:1.5px dashed #2A242055;color:var(--ink);}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:8px;}
+  .ficha{background:var(--paper-card);border:1px solid #2A242018;border-radius:12px;overflow:hidden;box-shadow:0 2px 0 #2A242012;cursor:pointer;text-align:left;transition:transform .1s;}
+  .ficha:hover{transform:translateY(-2px);}
+  .punch{height:16px;background-repeat:repeat-x;background-size:24px 16px;background-image:radial-gradient(circle at 12px 8px, var(--paper) 5px, transparent 5.5px);}
+  .ficha-body{padding:16px;}
+  .brand-tag{font-size:11px;letter-spacing:1.5px;font-weight:700;}
+  .recipe-name{font-family:'Bebas Neue';font-size:26px;line-height:1.1;margin-top:2px;}
+  .meta{font-size:12.5px;color:var(--ink-soft);margin-top:10px;}
+  .divider{border-top:1px dashed #2A242022;margin-top:12px;padding-top:12px;display:flex;justify-content:space-between;align-items:center;}
+  .mono{font-family:'JetBrains Mono';}
+  .cost-label{font-size:11px;color:var(--ink-soft);}
+  .cost-value{font-family:'JetBrains Mono';font-weight:700;font-size:15px;}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:16px 0;flex-wrap:wrap;gap:10px;}
+  .btn{border:none;cursor:pointer;font-family:'Work Sans';font-weight:600;border-radius:8px;padding:10px 16px;font-size:14px;}
+  .btn-primary{color:#fff;}
+  .btn-ghost{background:transparent;border:1px solid #2A242033;color:var(--ink);}
+  .btn-link{background:none;border:none;color:var(--brick);font-weight:600;cursor:pointer;font-family:'Work Sans';font-size:13px;}
+  .empty{background:var(--paper-dark);border-radius:12px;padding:32px;text-align:center;color:var(--ink-soft);}
+  .confirm{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 16px;border-radius:10px;margin-bottom:16px;background:#F6E3DA;border:1px solid #C1440E55;}
+  .field-label{display:block;font-size:11px;color:var(--ink-soft);margin-bottom:4px;}
+  .section-label{font-family:'Work Sans';font-size:11px;letter-spacing:2px;font-weight:700;color:#8C6E4E;margin:4px 0 10px;}
+  .base-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;background:var(--ink);color:var(--paper);padding:2px 8px;border-radius:999px;margin-bottom:4px;}
+  input[type=text], input[type=number], textarea, select{
+    font-family:'Work Sans';font-size:13.5px;border:1px solid #2A242022;background:var(--paper);
+    border-radius:6px;padding:8px 10px;outline:none;
+  }
+  .swatch-row{display:flex;gap:6px;}
+  .swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;}
+  .swatch.sel{border-color:var(--ink);}
+  .add-brand-box{background:var(--paper-dark);border-radius:12px;padding:20px;margin:16px 0;}
+  .add-brand-box .flexrow{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-top:10px;}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:#2A2420AA;z-index:50;display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;padding:32px 16px;}
+  .modal{width:100%;max-width:680px;background:var(--paper-card);border-radius:16px;overflow:hidden;}
+  .modal-body{padding:24px;}
+  .modal-top{display:flex;justify-content:space-between;gap:12px;}
+  .close-x{background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);line-height:1;}
+  .recipe-name-input{font-family:'Bebas Neue';font-size:32px;color:var(--ink);background:transparent;border:none;width:100%;padding:6px 0;outline:none;}
+  .scale-box{display:flex;gap:20px;align-items:center;background:var(--paper-dark);padding:16px;border-radius:12px;margin-top:14px;}
+  .scale-box input[type=range]{width:100%;}
+  .scale-num{font-family:'JetBrains Mono';font-weight:700;font-size:20px;min-width:56px;text-align:center;}
+  .ing-header, .ing-row{display:grid;grid-template-columns:1.6fr .9fr 1fr .9fr auto auto;gap:8px;align-items:center;}
+  .ing-header div{font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.5px;}
+  .ing-row{padding:6px 0;border-bottom:1px solid #2A242014;}
+  .ing-row input{width:100%;text-align:right;}
+  .ing-row input.name-input{text-align:left;}
+  .subtotal{font-family:'JetBrains Mono';font-size:13.5px;text-align:right;}
+  .add-ing{margin-top:10px;padding:8px 14px;border-radius:8px;background:transparent;border:1.5px dashed #2A242055;color:var(--ink);font-weight:600;font-size:13px;cursor:pointer;font-family:'Work Sans';}
+  textarea{width:100%;resize:vertical;}
+  .stamp-box{display:flex;justify-content:space-between;background:var(--ink);color:var(--paper);border-radius:12px;padding:16px;margin-top:20px;}
+  .stamp-label{font-size:11px;color:#F3EEE6AA;letter-spacing:1px;}
+  .stamp-value{font-family:'JetBrains Mono';font-weight:700;font-size:24px;}
+  .stamp-detail{font-size:11px;color:#F3EEE6AA;max-width:260px;text-align:right;}
+  .modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px;}
+  .modal-actions .right{display:flex;gap:10px;}
+
+  /* Print */
+  #print-area{display:none;}
+  @media print{
+    body *{visibility:hidden;}
+    #print-area, #print-area *{visibility:visible;}
+    #print-area{display:block;position:absolute;top:0;left:0;width:100%;padding:24px;}
+    .p-brand{font-family:'Work Sans';font-size:12px;letter-spacing:2px;font-weight:700;}
+    .p-title{font-family:'Bebas Neue';font-size:38px;margin:2px 0 10px;}
+    .p-meta{font-family:'Work Sans';font-size:13px;color:#444;margin-bottom:14px;}
+    table{width:100%;border-collapse:collapse;font-family:'Work Sans';font-size:13px;}
+    th,td{border-bottom:1px solid #ccc;padding:6px 4px;text-align:left;}
+    th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:right;}
+    .p-total{margin-top:14px;font-family:'JetBrains Mono';font-weight:700;font-size:16px;}
+    .p-notes{margin-top:14px;font-family:'Work Sans';font-size:13px;white-space:pre-wrap;}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" id="app"><div class="empty">Conectando con Firebase…</div></div>
+  <div id="print-area"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCYlz_x-azKXwbtHhb5WbgX5YX9thQV2iY",
+  authDomain: "app-control-pedidos-ya.firebaseapp.com",
+  projectId: "app-control-pedidos-ya",
+  storageBucket: "app-control-pedidos-ya.firebasestorage.app",
+  messagingSenderId: "285627295412",
+  appId: "1:285627295412:web:5f816af85bd91968d659e1"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
+const DATA_DOC = doc(db, "kitchenData", "main");
+const PALETTE = ["#C1440E","#5B6F4F","#D4941E","#6B4570","#2E6E62","#8C6E4E"];
+const uid = (p) => p + "_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,7);
+
+const fmtGs = (n) => { if(!isFinite(n)) n=0; return "Gs. " + Math.round(n).toLocaleString("es-PY"); };
+const fmtG = (n) => { if(!isFinite(n)) n=0; return (Math.round(n*10)/10).toLocaleString("es-PY") + " g"; };
+const fmtWeight = (n) => {
+  if(!isFinite(n)) n=0;
+  if(n >= 1000) return (Math.round(n/10)/100).toLocaleString("es-PY", {minimumFractionDigits:2, maximumFractionDigits:2}) + " kg";
+  return Math.round(n).toLocaleString("es-PY") + " g";
+};
+const DOCENA_PRESETS = [12, 24, 36, 48];
+
+let data = null;
+let ui = { activeBrandId: null, addingBrand: false, editingBrandId: null, confirmDeleteBrandId: null, reorderingBrands: false };
+
+function seedData(){
+  return {
+    settings: { pedidosYaFeePercent: 30 },
+    brands: [
+      { id: uid("brand"), name: "Dono Pizzas", color: PALETTE[0] },
+      { id: uid("brand"), name: "Masa Empanadas", color: PALETTE[1] },
+    ],
+    recipes: []
+  };
+}
+
+async function loadData(){
+  onAuthStateChanged(auth, (user) => {
+    if(user){ startListening(); }
+  });
+  try{
+    await signInAnonymously(auth);
+  }catch(e){
+    console.error(e);
+    document.getElementById("app").innerHTML = '<div class="empty">No se pudo conectar con Firebase (login). Revisá que Authentication → Anonymous esté habilitado en la consola de Firebase.</div>';
+  }
+}
+
+function normalizeData(d){
+  d.settings = { pedidosYaFeePercent: 30, ...(d.settings || {}) };
+  d.recipes = (d.recipes || []).map(r => ({
+    isBase: false,
+    components: [],
+    notes: "",
+    sellingPrice: 0,
+    ...r,
+    ingredients: r.ingredients || [],
+  }));
+  return d;
+}
+
+function startListening(){
+  onSnapshot(DATA_DOC, (snap) => {
+    if(snap.exists()){
+      data = normalizeData(snap.data());
+    } else {
+      data = seedData();
+      setDoc(DATA_DOC, data);
+    }
+    if(!ui.activeBrandId && data.brands[0]) ui.activeBrandId = data.brands[0].id;
+    else if(ui.activeBrandId && !data.brands.some(b => b.id === ui.activeBrandId)){
+      ui.activeBrandId = data.brands[0] ? data.brands[0].id : null;
+    }
+    render();
+  }, (err) => {
+    console.error(err);
+    document.getElementById("app").innerHTML = '<div class="empty">No se pudo leer los datos de Firestore. Revisá las reglas de seguridad del proyecto.</div>';
+  });
+}
+
+async function saveData(){
+  try{ await setDoc(DATA_DOC, data); }
+  catch(e){ console.error("No se pudo guardar", e); }
+}
+
+// Cálculo de margen: a partir del precio de venta, descuenta la comisión de la plataforma
+// (ej: Pedidos Ya) y compara lo que queda neto contra el costo de producción.
+function marginInfo(sellingPrice, cost, feePercent){
+  const price = parseFloat(sellingPrice) || 0;
+  const fee = price * ((parseFloat(feePercent) || 0) / 100);
+  const net = price - fee;
+  const profit = net - cost;
+  const marginPct = price > 0 ? (profit / price) * 100 : 0;
+  return { price, fee, net, profit, marginPct };
+}
+
+function recipeById(id){
+  return data.recipes.find(r => r.id === id);
+}
+
+// Cost of a single ingredient line: by weight (grams used × price/kg) or by unit (qty used × price/unit).
+function ingredientCost(ing){
+  if(ing.mode === "unit"){
+    const qty = parseFloat(ing.qty) || 0;
+    const pricePerUnit = parseFloat(ing.pricePerUnit) || 0;
+    return qty * pricePerUnit;
+  }
+  const grams = parseFloat(ing.grams) || 0;
+  const price = parseFloat(ing.pricePerKg) || 0;
+  return (grams/1000) * price;
+}
+
+// Grams an ingredient line contributes to the recipe's total weight (used for the batch-weight
+// stamp on preparaciones base, and for the shopping list). For "por unidad" ingredients, this
+// relies on the optional "peso de 1 unidad" the user can fill in (ej: 1 huevo ≈ 60 g).
+function ingredientGrams(ing){
+  if(ing.mode === "unit"){
+    const qty = parseFloat(ing.qty) || 0;
+    const gramsPerUnit = parseFloat(ing.gramsPerUnit) || 0;
+    return qty * gramsPerUnit;
+  }
+  return parseFloat(ing.grams) || 0;
+}
+
+function rawIngredientsCost(recipe){
+  return (recipe.ingredients || []).reduce((sum, ing) => sum + ingredientCost(ing), 0);
+}
+
+// Total grams that "1 unit" of a recipe represents, based on its own direct ingredients
+// (used to convert a "grams used" component into a fraction of that recipe's unit cost).
+function baseUnitGrams(recipe){
+  if(!recipe) return 0;
+  return (recipe.ingredients || []).reduce((sum, ing) => sum + ingredientGrams(ing), 0);
+}
+
+// Turns a component's stored quantity into a multiplier of "1 unit of the base recipe".
+// unit "units" -> the number entered is already that multiplier (ej: 1 disco de masa).
+// unit "grams" -> the number entered is grams used, converted via the base's total unit weight
+// (ej: usás 60 g de una preparación cuyo lote de referencia pesa 1.250 g en total).
+// Turns a component's stored quantity into a multiplier of the base recipe's FULL BATCH cost
+// (recipeCost(base) = costo de todo el lote, tal como lo cargaste en sus ingredientes).
+// unit "units" -> ej: "1 disco de masa por pizza". El lote rinde base.basePortions unidades
+// (el número en "Rinde: X unidades" de esa preparación), así que 1 unidad = 1/basePortions del lote.
+// unit "grams" -> el número entered es gramos usados, convertido según el peso total del lote
+// (ej: usás 60 g de una preparación cuyo lote pesa 1.250 g en total).
+function componentMultiplier(comp, base){
+  const val = parseFloat(comp.qty) || 0;
+  if(comp.unit === "grams"){
+    const unitGrams = baseUnitGrams(base);
+    return unitGrams > 0 ? val / unitGrams : 0;
+  }
+  const rinde = parseFloat(base.basePortions) || 1;
+  return rinde > 0 ? val / rinde : 0;
+}
+
+// Cost per unit, including the cost of any base preparations (components) it uses.
+// `ancestry` guards against accidental circular references (a base that ends up using itself).
+function recipeCost(recipe, ancestry){
+  ancestry = ancestry || [];
+  if(!recipe || ancestry.includes(recipe.id)) return 0;
+  let cost = rawIngredientsCost(recipe);
+  (recipe.components || []).forEach(c => {
+    const base = recipeById(c.baseId);
+    if(base){
+      const mult = componentMultiplier(c, base);
+      cost += mult * recipeCost(base, [...ancestry, recipe.id]);
+    }
+  });
+  return cost;
+}
+
+// Expands a recipe (and any base preparations it uses) into a flat shopping list of
+// raw ingredients, aggregating repeated ingredients (e.g. salt used in both dough and filling).
+function collectShoppingList(recipe, qty, ancestry, map){
+  ancestry = ancestry || [];
+  map = map || {};
+  if(!recipe || ancestry.includes(recipe.id)) return map;
+  (recipe.ingredients || []).forEach(ing => {
+    if(!ing.name) return;
+    const key = ing.name.trim().toLowerCase();
+    if(!map[key]) map[key] = { name: ing.name, grams: 0, units: 0, cost: 0 };
+    map[key].cost += ingredientCost(ing) * qty;
+    if(ing.mode === "unit"){
+      map[key].units += (parseFloat(ing.qty) || 0) * qty;
+    } else {
+      map[key].grams += (parseFloat(ing.grams) || 0) * qty;
+    }
+  });
+  (recipe.components || []).forEach(c => {
+    const base = recipeById(c.baseId);
+    if(base){
+      const subQty = componentMultiplier(c, base) * qty;
+      collectShoppingList(base, subQty, [...ancestry, recipe.id], map);
+    }
+  });
+  return map;
+}
+
+function el(html){
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+async function moveBrand(idx, dir){
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= data.brands.length) return;
+  const [moved] = data.brands.splice(idx, 1);
+  data.brands.splice(newIdx, 0, moved);
+  render();
+  await saveData();
+}
+
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  const header = el(`<div>
+    <div class="eyebrow">RECETARIO DE PRODUCCIÓN</div>
+    <div class="title">FICHAS TÉCNICAS</div>
+  </div>`);
+  app.appendChild(header);
+
+  // tabs
+  const tabs = el(`<div class="tabs"></div>`);
+  data.brands.forEach((b, idx) => {
+    const active = b.id === ui.activeBrandId;
+    if(ui.reorderingBrands){
+      const tab = el(`<div class="tab" style="background:${active ? b.color : "#EAE2D2"};border-color:${active ? b.color : "#2A242022"};display:flex;align-items:center;gap:6px;padding-right:6px;">
+        <span class="dot" style="background:${active ? "#F3EEE6" : b.color}"></span>${b.name}
+        <span style="display:flex;gap:2px;margin-left:4px;">
+          <button class="move-left" ${idx === 0 ? "disabled" : ""} style="border:none;background:${active ? "#F3EEE622" : "#2A242011"};border-radius:6px;width:22px;height:22px;cursor:pointer;color:inherit;opacity:${idx === 0 ? "0.35" : "1"};">‹</button>
+          <button class="move-right" ${idx === data.brands.length - 1 ? "disabled" : ""} style="border:none;background:${active ? "#F3EEE622" : "#2A242011"};border-radius:6px;width:22px;height:22px;cursor:pointer;color:inherit;opacity:${idx === data.brands.length - 1 ? "0.35" : "1"};">›</button>
+        </span>
+      </div>`);
+      tab.querySelector(".move-left").onclick = () => moveBrand(idx, -1);
+      tab.querySelector(".move-right").onclick = () => moveBrand(idx, 1);
+      tabs.appendChild(tab);
+    } else {
+      const tab = el(`<div class="tab ${active ? "active" : ""}" style="background:${active ? b.color : "#EAE2D2"};border-color:${active ? b.color : "#2A242022"}">
+        <span class="dot" style="background:${active ? "#F3EEE6" : b.color}"></span>${b.name}
+      </div>`);
+      tab.onclick = () => { ui.activeBrandId = b.id; ui.addingBrand = false; ui.editingBrandId = null; render(); };
+      tabs.appendChild(tab);
+    }
+  });
+  if(!ui.reorderingBrands){
+    const addTab = el(`<div class="tab-add">+ Marca</div>`);
+    addTab.onclick = () => { ui.addingBrand = true; ui.editingBrandId = null; render(); };
+    tabs.appendChild(addTab);
+  }
+  if(data.brands.length > 1){
+    const reorderTab = el(`<div class="tab-add" style="border-style:solid;">${ui.reorderingBrands ? "Listo" : "↕ Ordenar"}</div>`);
+    reorderTab.onclick = () => { ui.reorderingBrands = !ui.reorderingBrands; render(); };
+    tabs.appendChild(reorderTab);
+  }
+  app.appendChild(tabs);
+
+  if(ui.addingBrand){
+    app.appendChild(renderBrandForm());
+  }
+
+  const brand = data.brands.find(b => b.id === ui.activeBrandId);
+  const recipesForBrand = brand ? data.recipes.filter(r => r.brandId === brand.id) : [];
+  const basesForBrand = recipesForBrand.filter(r => r.isBase);
+  const productsForBrand = recipesForBrand.filter(r => !r.isBase);
+
+  if(brand && ui.editingBrandId === brand.id){
+    app.appendChild(renderBrandForm(brand));
+  }
+
+  if(brand && ui.editingBrandId !== brand.id){
+    const row = el(`<div class="row">
+      <div style="font-size:13px;color:var(--ink-soft)">${recipesForBrand.length} receta${recipesForBrand.length !== 1 ? "s" : ""} en <b style="color:${brand.color}">${brand.name}</b></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-ghost new-base-btn">+ Preparación base</button>
+        <button class="btn btn-primary new-recipe-btn" style="background:${brand.color}">+ Nueva receta</button>
+        <button class="btn-link edit-brand-btn" style="color:#8C6E4E">Editar marca</button>
+        <button class="btn-link" style="color:#8C6E4E">Eliminar marca</button>
+      </div>
+    </div>`);
+    row.querySelector(".new-recipe-btn").onclick = () => openModal(null, brand.id, false);
+    row.querySelector(".new-base-btn").onclick = () => openModal(null, brand.id, true);
+    row.querySelector(".edit-brand-btn").onclick = () => { ui.editingBrandId = brand.id; ui.addingBrand = false; render(); };
+    row.querySelector(".btn-link:last-child").onclick = () => { ui.confirmDeleteBrandId = brand.id; render(); };
+    app.appendChild(row);
+  }
+
+  if(ui.confirmDeleteBrandId){
+    const c = el(`<div class="confirm">
+      <span>¿Eliminar esta marca? También se eliminan todas sus recetas.</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost">Cancelar</button>
+        <button class="btn btn-primary" style="background:#C1440E">Sí, eliminar</button>
+      </div>
+    </div>`);
+    c.querySelectorAll("button")[0].onclick = () => { ui.confirmDeleteBrandId = null; render(); };
+    c.querySelectorAll("button")[1].onclick = async () => {
+      const bid = ui.confirmDeleteBrandId;
+      data.brands = data.brands.filter(b => b.id !== bid);
+      data.recipes = data.recipes.filter(r => r.brandId !== bid);
+      ui.confirmDeleteBrandId = null;
+      if(ui.activeBrandId === bid) ui.activeBrandId = data.brands[0] ? data.brands[0].id : null;
+      await saveData();
+      render();
+    };
+    app.appendChild(c);
+  }
+
+  if(brand && recipesForBrand.length === 0 && !ui.addingBrand){
+    app.appendChild(el(`<div class="empty">Todavía no cargaste nada para esta marca. Empezá creando las preparaciones base (ej: masa de pizza) y después las recetas que las usan.</div>`));
+  }
+
+  if(brand && basesForBrand.length > 0){
+    app.appendChild(el(`<div class="section-label">PREPARACIONES BASE</div>`));
+    const baseGrid = el(`<div class="card-grid"></div>`);
+    basesForBrand.forEach(r => baseGrid.appendChild(renderCard(r, brand)));
+    app.appendChild(baseGrid);
+  }
+
+  if(brand && (productsForBrand.length > 0 || basesForBrand.length > 0)){
+    app.appendChild(el(`<div class="section-label" style="margin-top:${basesForBrand.length ? "22px" : "0"};">RECETAS</div>`));
+  }
+  if(brand && productsForBrand.length > 0){
+    const grid = el(`<div class="card-grid"></div>`);
+    productsForBrand.forEach(r => grid.appendChild(renderCard(r, brand)));
+    app.appendChild(grid);
+  } else if(brand && basesForBrand.length > 0){
+    app.appendChild(el(`<div style="font-size:13px;color:var(--ink-soft);padding:4px 0;">Todavía no hay recetas que usen estas preparaciones base.</div>`));
+  }
+}
+
+function renderBrandForm(existingBrand){
+  let name = existingBrand ? existingBrand.name : "";
+  let color = existingBrand ? existingBrand.color : PALETTE[0];
+  const box = el(`<div class="add-brand-box">
+    <div class="title" style="font-size:22px;">${existingBrand ? "EDITAR MARCA" : "NUEVA MARCA"}</div>
+    <div class="flexrow">
+      <div style="flex:1;min-width:180px;">
+        <label class="field-label">Nombre</label>
+        <input type="text" class="name-input" placeholder="Ej: Empanadas del Sur" style="width:100%;" value="${name.replace(/"/g,'&quot;')}" />
+      </div>
+      <div>
+        <label class="field-label">Color</label>
+        <div class="swatch-row"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost">Cancelar</button>
+        <button class="btn btn-primary" style="background:#2A2420">${existingBrand ? "Guardar cambios" : "Crear marca"}</button>
+      </div>
+    </div>
+  </div>`);
+  const nameInput = box.querySelector(".name-input");
+  nameInput.oninput = (e) => name = e.target.value;
+  const swRow = box.querySelector(".swatch-row");
+  PALETTE.forEach(c => {
+    const sw = el(`<div class="swatch ${c === color ? "sel" : ""}" style="background:${c}"></div>`);
+    sw.onclick = () => { color = c; swRow.querySelectorAll(".swatch").forEach(s => s.classList.remove("sel")); sw.classList.add("sel"); };
+    swRow.appendChild(sw);
+  });
+  box.querySelector(".btn-ghost").onclick = () => { ui.addingBrand = false; ui.editingBrandId = null; render(); };
+  box.querySelector(".btn-primary").onclick = async () => {
+    if(!name.trim()) return;
+    if(existingBrand){
+      existingBrand.name = name.trim();
+      existingBrand.color = color;
+      ui.editingBrandId = null;
+    } else {
+      const newBrand = { id: uid("brand"), name: name.trim(), color };
+      data.brands.push(newBrand);
+      ui.activeBrandId = newBrand.id;
+      ui.addingBrand = false;
+    }
+    await saveData();
+    render();
+  };
+  return box;
+}
+
+function punchStyle(color){
+  return `background:${color};background-image:radial-gradient(circle at 12px 8px, var(--paper) 5px, transparent 5.5px);background-size:24px 16px;background-repeat:repeat-x;`;
+}
+
+function renderCard(recipe, brand){
+  const cost = recipeCost(recipe);
+  const compCount = (recipe.components || []).length;
+  const metaExtra = compCount > 0 ? ` · usa ${compCount} base${compCount !== 1 ? "s" : ""}` : "";
+  const feePct = data.settings ? data.settings.pedidosYaFeePercent : 30;
+  const info = marginInfo(recipe.sellingPrice, cost, feePct);
+  const marginRow = (recipe.sellingPrice > 0)
+    ? `<div class="divider" style="margin-top:6px;">
+        <span class="cost-label">Margen (venta ${fmtGs(info.price)})</span>
+        <span class="cost-value" style="color:${info.profit >= 0 ? "#2E7D32" : "#C1440E"}">${info.marginPct.toFixed(1)}%</span>
+      </div>`
+    : "";
+  const card = el(`<div class="ficha">
+    <div class="punch" style="${punchStyle(brand ? brand.color : "#8C6E4E")}"></div>
+    <div class="ficha-body">
+      <div class="brand-tag" style="color:${brand ? brand.color : "#8C6E4E"}">${(brand ? brand.name : "SIN MARCA").toUpperCase()}</div>
+      ${recipe.isBase ? '<div class="base-badge">PREPARACIÓN BASE</div>' : ""}
+      <div class="recipe-name">${recipe.name || "Receta sin nombre"}</div>
+      <div class="meta">Rinde: <b>${recipe.basePortions}</b> unidades · ${recipe.ingredients.length} ingredientes${metaExtra}</div>
+      <div class="divider">
+        <span class="cost-label">Costo / unidad</span>
+        <span class="cost-value">${fmtGs(cost)}</span>
+      </div>
+      ${marginRow}
+    </div>
+  </div>`);
+  card.onclick = () => openModal(recipe.id, recipe.brandId);
+  return card;
+}
+
+// ---------- Modal / Editor ----------
+function openModal(recipeId, brandId, forceBase){
+  const isNew = !recipeId;
+  const local = isNew
+    ? { id: uid("recipe"), brandId: brandId, name: "", basePortions: 12, ingredients: [], components: [], notes: "", isBase: !!forceBase, sellingPrice: 0 }
+    : JSON.parse(JSON.stringify(recipeById(recipeId)));
+
+  let scalePortions = local.basePortions || 1;
+  let confirmingDelete = false;
+  let autosaveTimer = null;
+  let firstRender = true;
+  const savedIndicator = { el: null };
+
+  function scheduleAutosave(){
+    if(isNew) return; // no autoguarda una receta nueva todavía sin nombre/sin "Guardar" al menos una vez
+    if(savedIndicator.el) savedIndicator.el.textContent = "Guardando…";
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(async () => {
+      const snapshot = JSON.parse(JSON.stringify(local));
+      if(!snapshot.name.trim()) return;
+      data.recipes = data.recipes.map(r => r.id === snapshot.id ? snapshot : r);
+      await saveData();
+      if(savedIndicator.el) savedIndicator.el.textContent = "Cambios guardados";
+    }, 900);
+  }
+
+  const overlay = el(`<div class="overlay"></div>`);
+  const modal = el(`<div class="modal"></div>`);
+  overlay.appendChild(modal);
+  overlay.onclick = (e) => { if(e.target === overlay) close(); };
+  document.body.appendChild(overlay);
+
+  function close(){ clearTimeout(autosaveTimer); overlay.remove(); }
+
+  function buildBody(){
+    modal.innerHTML = "";
+    const brandNow = data.brands.find(b => b.id === local.brandId) || data.brands[0];
+    modal.appendChild(el(`<div class="punch" style="${punchStyle(brandNow ? brandNow.color : "#8C6E4E")}"></div>`));
+
+    const body = el(`<div class="modal-body"></div>`);
+
+    const top = el(`<div class="modal-top">
+      <div style="flex:1;">
+        <label class="field-label">Marca</label>
+        <select class="brand-select"></select>
+        <input type="text" class="recipe-name-input" placeholder="Nombre de la receta" value="${local.name.replace(/"/g,'&quot;')}" />
+        ${!isNew ? '<div class="autosave-indicator" style="font-size:11px;color:var(--ink-soft);margin-top:2px;">Cambios guardados</div>' : ''}
+      </div>
+      <button class="close-x">×</button>
+    </div>`);
+    savedIndicator.el = top.querySelector(".autosave-indicator");
+    const sel = top.querySelector(".brand-select");
+    data.brands.forEach(b => {
+      const opt = el(`<option value="${b.id}">${b.name}</option>`);
+      if(b.id === local.brandId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.onchange = (e) => { local.brandId = e.target.value; buildBody(); };
+    top.querySelector(".recipe-name-input").oninput = (e) => { local.name = e.target.value; scheduleAutosave(); };
+    top.querySelector(".close-x").onclick = close;
+    body.appendChild(top);
+
+    const baseToggle = el(`<label style="display:flex;align-items:center;gap:8px;margin-top:4px;cursor:pointer;">
+      <input type="checkbox" class="is-base-check" ${local.isBase ? "checked" : ""} />
+      <span style="font-family:'Work Sans';font-size:13px;color:var(--ink-soft);">Es una <b>preparación base</b> (ej: masa, salsa) para usar dentro de otras recetas</span>
+    </label>`);
+    baseToggle.querySelector(".is-base-check").onchange = (e) => {
+      local.isBase = e.target.checked;
+      if(local.isBase) local.components = [];
+      buildBody();
+    };
+    body.appendChild(baseToggle);
+
+    const scaleBox = el(`<div class="scale-box" style="flex-wrap:wrap;">
+      <div>
+        <label class="field-label">Rinde (unidades por tanda habitual)</label>
+        <input type="number" min="1" class="base-portions mono" value="${local.basePortions}" style="width:80px;text-align:center;font-weight:700;" />
+      </div>
+      <div style="flex:1;min-width:220px;">
+        <label class="field-label">¿Cuántas unidades vas a producir hoy?</label>
+        <div class="docena-presets"></div>
+      </div>
+      <div>
+        <label class="field-label">Unidades exactas</label>
+        <input type="number" min="1" class="scale-input mono" value="${scalePortions}" style="width:80px;text-align:center;font-weight:700;" />
+      </div>
+    </div>`);
+    scaleBox.querySelector(".base-portions").oninput = (e) => {
+      local.basePortions = e.target.value;
+      updateStamp();
+    };
+    const presetRow = scaleBox.querySelector(".docena-presets");
+    presetRow.style.display = "flex";
+    presetRow.style.gap = "6px";
+    presetRow.style.flexWrap = "wrap";
+    DOCENA_PRESETS.forEach((n, idx) => {
+      const label = `${idx+1} docena${idx>0?"s":""}`;
+      const btn = el(`<button type="button" class="btn btn-ghost preset-btn" style="padding:6px 12px;font-size:12.5px;">${label}<br><span style="font-family:'JetBrains Mono';font-size:11px;">${n} un.</span></button>`);
+      btn.onclick = () => {
+        scalePortions = n;
+        scaleBox.querySelector(".scale-input").value = n;
+        updateStamp();
+      };
+      presetRow.appendChild(btn);
+    });
+    scaleBox.querySelector(".scale-input").oninput = (e) => {
+      scalePortions = e.target.value;
+      updateStamp();
+    };
+    body.appendChild(scaleBox);
+
+    const ingSection = el(`<div style="margin-top:18px;"></div>`);
+    ingSection.appendChild(el(`<div class="field-label" style="margin-bottom:6px;">INGREDIENTES</div>`));
+
+    const list = el(`<div class="ing-list"></div>`);
+    if(local.ingredients.length === 0){
+      list.appendChild(el(`<div style="padding:10px 0;color:var(--ink-soft);font-size:13px;">Todavía no cargaste ingredientes. Sumá el primero.</div>`));
+    }
+    local.ingredients.forEach((ing, idx) => list.appendChild(renderIngRow(ing, idx)));
+    ingSection.appendChild(list);
+
+    const addBtn = el(`<button class="add-ing">+ Agregar ingrediente</button>`);
+    addBtn.onclick = () => {
+      local.ingredients.push({ id: uid("ing"), name: "", mode: "weight", grams: "", pricePerKg: "", qty: "", pricePerUnit: "", gramsPerUnit: "" });
+      buildBody();
+    };
+    ingSection.appendChild(addBtn);
+    body.appendChild(ingSection);
+
+    if(local.isBase){
+      const totalGramsInit = baseUnitGrams(local);
+      const totalCostInit = rawIngredientsCost(local);
+      const rindeInit = parseFloat(local.basePortions) || 1;
+      const perGramInit = totalGramsInit > 0 ? totalCostInit / totalGramsInit : 0;
+      const perUnitInit = rindeInit > 0 ? totalCostInit / rindeInit : 0;
+      const batchBox = el(`<div class="scale-box" style="flex-wrap:wrap;align-items:flex-start;gap:24px;">
+        <div>
+          <div class="field-label">COSTO TOTAL DEL LOTE</div>
+          <div class="batch-total-cost" style="font-size:24px;font-weight:700;color:#C1440E;">${fmtGs(totalCostInit)}</div>
+        </div>
+        <div>
+          <div class="field-label">PESO TOTAL DEL LOTE</div>
+          <div class="batch-weight" style="font-size:20px;font-weight:700;">${fmtWeight(totalGramsInit)}</div>
+        </div>
+        <div>
+          <div class="field-label">→ POR UNIDAD (RINDE <span class="batch-rinde-label">${rindeInit}</span>)</div>
+          <div class="batch-per-unit" style="font-size:20px;font-weight:700;">${fmtGs(perUnitInit)}</div>
+        </div>
+        <div>
+          <div class="field-label">→ POR GRAMO / POR KG</div>
+          <div style="font-size:13px;font-weight:600;">
+            <span class="batch-per-gram">${fmtGs(perGramInit)}/g</span> ·
+            <span class="batch-per-kg">${fmtGs(perGramInit * 1000)}/kg</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;font-size:11.5px;color:var(--ink-soft);align-self:center;">
+          "Por gramo/kg" es una tarifa, no el total — si el lote pesa más de 1 kg, el costo real de todo el lote es más alto que ese número. Usá el "costo total del lote" (izquierda) como referencia del gasto real de esta tanda.
+        </div>
+      </div>`);
+      body.appendChild(batchBox);
+    }
+
+    if(!local.isBase){
+      const compWrap = el(`<div class="comp-section"></div>`);
+      compWrap.appendChild(buildComponentsSection());
+      body.appendChild(compWrap);
+    }
+
+    const notes = el(`<div style="margin-top:18px;">
+      <label class="field-label">Notas / procedimiento (opcional)</label>
+      <textarea rows="3">${(local.notes||"").replace(/</g,"&lt;")}</textarea>
+    </div>`);
+    notes.querySelector("textarea").oninput = (e) => { local.notes = e.target.value; scheduleAutosave(); };
+    body.appendChild(notes);
+
+    const stamp = el(`<div class="stamp-box">
+      <div>
+        <div class="stamp-label">COSTO POR UNIDAD</div>
+        <div class="stamp-value cost-per-portion">${fmtGs(recipeCost(local))}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="stamp-label">LOTE PARA <span class="scale-echo">${scalePortions}</span> UNIDADES</div>
+        <div class="stamp-value batch-total">${fmtGs(recipeCost(local) * (parseFloat(scalePortions)||0))}</div>
+      </div>
+    </div>`);
+    body.appendChild(stamp);
+
+    const feePct = data.settings ? data.settings.pedidosYaFeePercent : 30;
+    body.appendChild(el(`<div class="field-label" style="margin-top:20px;margin-bottom:6px;">PRECIO DE VENTA Y MARGEN</div>`));
+    const margin = el(`<div class="scale-box" style="flex-wrap:wrap;align-items:flex-start;gap:20px;">
+      <div style="min-width:150px;">
+        <label class="field-label">Precio de venta (Gs.)</label>
+        <input type="number" class="selling-price mono" min="0" step="any" value="${local.sellingPrice || 0}" />
+      </div>
+      <div style="min-width:120px;">
+        <label class="field-label">Comisión Pedidos Ya (%)</label>
+        <input type="number" class="fee-pct mono" min="0" max="100" step="any" value="${feePct}" />
+        <div style="font-size:10.5px;color:var(--ink-soft);margin-top:3px;">se aplica a todas las recetas</div>
+      </div>
+      <div style="flex:1;min-width:220px;">
+        <div class="field-label">MARGEN</div>
+        <div class="margin-detail" style="font-size:13px;line-height:1.7;"></div>
+      </div>
+    </div>`);
+    body.appendChild(margin);
+
+    function updateMargin(){
+      const cost = recipeCost(local);
+      const info = marginInfo(local.sellingPrice, cost, data.settings.pedidosYaFeePercent);
+      const color = info.profit >= 0 ? "#2E7D32" : "#C1440E";
+      margin.querySelector(".margin-detail").innerHTML = `
+        Comisión Pedidos Ya: <b>${fmtGs(info.fee)}</b> &nbsp;·&nbsp; Neto recibido: <b>${fmtGs(info.net)}</b><br/>
+        Ganancia por unidad: <b style="color:${color}">${fmtGs(info.profit)}</b> &nbsp;·&nbsp; Margen: <b style="color:${color}">${info.price > 0 ? info.marginPct.toFixed(1) : "0.0"}%</b>
+      `;
+    }
+    margin.querySelector(".selling-price").oninput = (e) => { local.sellingPrice = e.target.value; updateMargin(); scheduleAutosave(); };
+    margin.querySelector(".fee-pct").oninput = (e) => {
+      data.settings.pedidosYaFeePercent = e.target.value;
+      updateMargin();
+    };
+    margin.querySelector(".fee-pct").onchange = async () => { await saveData(); };
+    updateMargin();
+
+    const shopWrap = el(`<div class="shopping-list" style="margin-top:16px;">
+      <div class="field-label" style="margin-bottom:8px;">LISTA DE COMPRAS PARA <span class="scale-echo-2">${scalePortions}</span> UNIDADES</div>
+      <div class="shop-rows"></div>
+    </div>`);
+    shopWrap.querySelector(".shop-rows").appendChild(buildShoppingRows());
+    body.appendChild(shopWrap);
+
+    if(confirmingDelete){
+      const usedBy = local.isBase ? data.recipes.filter(r => (r.components||[]).some(c => c.baseId === local.id)) : [];
+      const warnText = usedBy.length > 0
+        ? `¿Eliminar esta preparación base? La usan ${usedBy.length} receta${usedBy.length !== 1 ? "s" : ""} (${usedBy.map(r=>r.name).join(", ")}), y va a dejar de sumarse a su costo. No se puede deshacer.`
+        : "¿Eliminar esta receta? No se puede deshacer.";
+      const c = el(`<div class="confirm" style="margin-top:16px;">
+        <span>${warnText}</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost">Cancelar</button>
+          <button class="btn btn-primary" style="background:#C1440E">Sí, eliminar</button>
+        </div>
+      </div>`);
+      c.querySelectorAll("button")[0].onclick = () => { confirmingDelete = false; buildBody(); };
+      c.querySelectorAll("button")[1].onclick = async () => {
+        data.recipes = data.recipes.filter(r => r.id !== local.id);
+        await saveData();
+        close(); render();
+      };
+      body.appendChild(c);
+    }
+
+    const actions = el(`<div class="modal-actions">
+      <div style="display:flex;gap:14px;align-items:center;">
+        <button class="btn-link delete-btn">Eliminar receta</button>
+        ${!isNew ? '<button class="btn-link print-btn" style="color:var(--ink)">Imprimir ficha</button>' : ''}
+      </div>
+      <div class="right">
+        <button class="btn btn-ghost">Cancelar</button>
+        <button class="btn btn-primary save-btn" style="background:#C1440E">Guardar receta</button>
+      </div>
+    </div>`);
+    actions.querySelector(".delete-btn").onclick = () => { confirmingDelete = true; buildBody(); };
+    const printBtn = actions.querySelector(".print-btn");
+    if(printBtn) printBtn.onclick = () => printRecipe(local, brandNow, scalePortions);
+    actions.querySelector(".btn-ghost").onclick = close;
+    actions.querySelector(".save-btn").onclick = async () => {
+      if(!local.name.trim()) local.name = "Receta sin nombre";
+      const exists = data.recipes.some(r => r.id === local.id);
+      if(exists){ data.recipes = data.recipes.map(r => r.id === local.id ? local : r); }
+      else{ data.recipes.push(local); }
+      await saveData();
+      close(); render();
+    };
+    body.appendChild(actions);
+
+    modal.appendChild(body);
+    if(firstRender){ firstRender = false; } else { updateStamp(); }
+  }
+
+  function availableBases(){
+    return data.recipes.filter(r => r.isBase && r.brandId === local.brandId && r.id !== local.id);
+  }
+
+  function buildComponentsSection(){
+    const wrap = el(`<div style="margin-top:20px;"></div>`);
+    wrap.appendChild(el(`<div class="field-label" style="margin-bottom:6px;">PREPARACIONES BASE QUE USA (ej: 1 disco de masa por pizza, o 60 g de coleslaw por sándwich)</div>`));
+
+    const bases = availableBases();
+    const list = el(`<div class="comp-list"></div>`);
+
+    if(local.components.length === 0){
+      list.appendChild(el(`<div style="padding:6px 0;color:var(--ink-soft);font-size:13px;">Todavía no agregaste ninguna preparación base a esta receta.</div>`));
+    }
+    local.components.forEach((comp, idx) => {
+      if(!comp.unit) comp.unit = "units";
+      const base = recipeById(comp.baseId);
+      const unitCost = base ? recipeCost(base) : 0;
+      const unitGrams = base ? baseUnitGrams(base) : 0;
+      const rinde = base ? (parseFloat(base.basePortions) || 1) : 1;
+      const mult = base ? componentMultiplier(comp, base) : 0;
+      const row = el(`<div style="padding:6px 0;border-bottom:1px solid #2A242014;">
+        <div style="display:grid;grid-template-columns:1.3fr .85fr .7fr 1fr auto;gap:8px;align-items:center;">
+          <select class="comp-select"></select>
+          <select class="comp-unit">
+            <option value="units">unidades</option>
+            <option value="grams">gramos</option>
+          </select>
+          <input type="number" class="comp-qty mono" min="0" step="any" value="${comp.qty}" style="text-align:right;" />
+          <div class="comp-cost mono" style="text-align:right;font-size:13.5px;">${fmtGs(unitCost * mult)}</div>
+          <button class="btn-link comp-remove">Quitar</button>
+        </div>
+        <div class="comp-hint" style="font-size:11.5px;color:var(--ink-soft);margin-top:3px;"></div>
+      </div>`);
+      const selEl = row.querySelector(".comp-select");
+      if(bases.length === 0){
+        selEl.appendChild(el(`<option value="">No hay bases en esta marca</option>`));
+      } else {
+        bases.forEach(b => {
+          const opt = el(`<option value="${b.id}">${b.name}</option>`);
+          if(b.id === comp.baseId) opt.selected = true;
+          selEl.appendChild(opt);
+        });
+      }
+      row.querySelector(".comp-unit").value = comp.unit;
+      const hintEl = row.querySelector(".comp-hint");
+      function computeHint(){
+        if(!base) return "";
+        if(comp.unit === "grams"){
+          return unitGrams > 0
+            ? `usando ${fmtG(parseFloat(comp.qty)||0)} de los ${fmtG(unitGrams)} que rinde el lote de "${base.name}"`
+            : `esta preparación base no tiene gramos cargados en sus ingredientes todavía`;
+        }
+        return `el lote de "${base.name}" rinde ${rinde} unidades (${fmtGs(unitCost)} en total) → ${fmtGs(rinde > 0 ? unitCost/rinde : 0)} por unidad`;
+      }
+      hintEl.textContent = computeHint();
+      selEl.onchange = (e) => { comp.baseId = e.target.value; buildBody(); };
+      row.querySelector(".comp-unit").onchange = (e) => { comp.unit = e.target.value; buildBody(); };
+      row.querySelector(".comp-qty").oninput = (e) => {
+        comp.qty = e.target.value;
+        const newMult = componentMultiplier(comp, base);
+        row.querySelector(".comp-cost").textContent = fmtGs(unitCost * newMult);
+        if(comp.unit === "grams"){
+          hintEl.textContent = computeHint();
+        }
+        updateStamp();
+      };
+      row.querySelector(".comp-remove").onclick = () => {
+        local.components = local.components.filter((_, i) => i !== idx);
+        buildBody();
+      };
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+
+    if(bases.length === 0){
+      wrap.appendChild(el(`<div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;">Creá primero una preparación base para esta marca (con "+ Preparación base") para poder sumarla acá.</div>`));
+    } else {
+      const addBtn = el(`<button class="add-ing" style="margin-top:8px;">+ Agregar preparación base</button>`);
+      addBtn.onclick = () => {
+        local.components.push({ id: uid("comp"), baseId: bases[0].id, qty: 1 });
+        buildBody();
+      };
+      wrap.appendChild(addBtn);
+    }
+    return wrap;
+  }
+
+  function buildShoppingRows(){
+    const qty = parseFloat(scalePortions) || 0;
+    const wrap = el(`<div></div>`);
+    const map = collectShoppingList(local, qty, []);
+    const rows = Object.values(map);
+    if(rows.length === 0){
+      wrap.appendChild(el(`<div style="font-size:13px;color:var(--ink-soft);">Cargá ingredientes (o preparaciones base) para ver cuánto comprar.</div>`));
+      return wrap;
+    }
+    rows.forEach(i => {
+      const qtyLabel = i.units > 0
+        ? `${(Math.round(i.units*10)/10).toLocaleString("es-PY")} un.${i.grams > 0 ? ` + ${fmtWeight(i.grams)}` : ""}`
+        : fmtWeight(i.grams);
+      const row = el(`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2A242014;font-size:13.5px;">
+        <span>${i.name}</span>
+        <span style="display:flex;gap:16px;">
+          <span class="mono" style="font-weight:600;">${qtyLabel}</span>
+          <span class="mono" style="color:var(--ink-soft);min-width:90px;text-align:right;">${fmtGs(i.cost)}</span>
+        </span>
+      </div>`);
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+
+  function updateStamp(){
+    scheduleAutosave();
+    const cost = recipeCost(local);
+    modal.querySelectorAll(".scale-echo, .scale-echo-2").forEach(el2 => el2.textContent = scalePortions);
+    modal.querySelector(".cost-per-portion").textContent = fmtGs(cost);
+    modal.querySelector(".batch-total").textContent = fmtGs(cost * (parseFloat(scalePortions)||0));
+    const batchWeightEl = modal.querySelector(".batch-weight");
+    if(batchWeightEl){
+      const totalGrams = baseUnitGrams(local);
+      const totalCost = rawIngredientsCost(local);
+      const rinde = parseFloat(local.basePortions) || 1;
+      const perGram = totalGrams > 0 ? totalCost / totalGrams : 0;
+      const perUnit = rinde > 0 ? totalCost / rinde : 0;
+      modal.querySelector(".batch-total-cost").textContent = fmtGs(totalCost);
+      batchWeightEl.textContent = fmtWeight(totalGrams);
+      modal.querySelector(".batch-per-unit").textContent = fmtGs(perUnit);
+      const rindeLabel = modal.querySelector(".batch-rinde-label");
+      if(rindeLabel) rindeLabel.textContent = rinde;
+      modal.querySelector(".batch-per-gram").textContent = fmtGs(perGram) + "/g";
+      modal.querySelector(".batch-per-kg").textContent = fmtGs(perGram * 1000) + "/kg";
+    }
+    const shopRows = modal.querySelector(".shop-rows");
+    shopRows.innerHTML = "";
+    shopRows.appendChild(buildShoppingRows());
+    const marginDetail = modal.querySelector(".margin-detail");
+    if(marginDetail){
+      const info = marginInfo(local.sellingPrice, cost, data.settings.pedidosYaFeePercent);
+      const color = info.profit >= 0 ? "#2E7D32" : "#C1440E";
+      marginDetail.innerHTML = `
+        Comisión Pedidos Ya: <b>${fmtGs(info.fee)}</b> &nbsp;·&nbsp; Neto recibido: <b>${fmtGs(info.net)}</b><br/>
+        Ganancia por unidad: <b style="color:${color}">${fmtGs(info.profit)}</b> &nbsp;·&nbsp; Margen: <b style="color:${color}">${info.price > 0 ? info.marginPct.toFixed(1) : "0.0"}%</b>
+      `;
+    }
+  }
+
+  function renderIngRow(ing, idx){
+    if(!ing.mode) ing.mode = "weight";
+    const row = el(`<div class="ing-row-block" style="padding:8px 0;border-bottom:1px solid #2A242014;">
+      <div style="display:grid;grid-template-columns:1.5fr 1.1fr auto auto;gap:8px;align-items:center;">
+        <input type="text" class="name-input" placeholder="Ingrediente" value="${(ing.name||"").replace(/"/g,'&quot;')}" />
+        <select class="mode-select">
+          <option value="weight">por peso (kg)</option>
+          <option value="unit">por unidad</option>
+        </select>
+        <div class="subtotal mono" style="text-align:right;min-width:80px;">${fmtGs(ingredientCost(ing))}</div>
+        <button class="btn-link remove-btn">Quitar</button>
+      </div>
+      <div class="ing-fields" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;"></div>
+    </div>`);
+    row.querySelector(".mode-select").value = ing.mode;
+
+    function renderFields(){
+      const fieldsWrap = row.querySelector(".ing-fields");
+      fieldsWrap.innerHTML = "";
+      if(ing.mode === "unit"){
+        fieldsWrap.appendChild(el(`<div>
+          <label class="field-label">Cantidad usada</label>
+          <input type="number" class="qty-input mono" min="0" step="any" placeholder="0" value="${ing.qty||""}" style="width:110px;" />
+        </div>`));
+        fieldsWrap.appendChild(el(`<div>
+          <label class="field-label">Gs. / unidad</label>
+          <input type="number" class="priceunit-input mono" min="0" step="any" placeholder="0" value="${ing.pricePerUnit||""}" style="width:110px;" />
+        </div>`));
+        fieldsWrap.appendChild(el(`<div>
+          <label class="field-label">Peso de 1 unidad (g)</label>
+          <input type="number" class="gramsunit-input mono" min="0" step="any" placeholder="ej: 60" value="${ing.gramsPerUnit||""}" style="width:110px;" />
+        </div>`));
+        fieldsWrap.querySelector(".qty-input").oninput = (e) => {
+          ing.qty = e.target.value;
+          row.querySelector(".subtotal").textContent = fmtGs(ingredientCost(ing));
+          updateStamp();
+        };
+        fieldsWrap.querySelector(".priceunit-input").oninput = (e) => {
+          ing.pricePerUnit = e.target.value;
+          row.querySelector(".subtotal").textContent = fmtGs(ingredientCost(ing));
+          updateStamp();
+        };
+        fieldsWrap.querySelector(".gramsunit-input").oninput = (e) => {
+          ing.gramsPerUnit = e.target.value;
+          updateStamp();
+        };
+      } else {
+        fieldsWrap.appendChild(el(`<div>
+          <label class="field-label">Gramos usados</label>
+          <input type="number" class="grams-input mono" min="0" step="any" placeholder="0" value="${ing.grams||""}" style="width:110px;" />
+        </div>`));
+        fieldsWrap.appendChild(el(`<div>
+          <label class="field-label">Gs. / kg</label>
+          <input type="number" class="price-input mono" min="0" step="any" placeholder="0" value="${ing.pricePerKg||""}" style="width:110px;" />
+        </div>`));
+        fieldsWrap.querySelector(".grams-input").oninput = (e) => {
+          ing.grams = e.target.value;
+          row.querySelector(".subtotal").textContent = fmtGs(ingredientCost(ing));
+          updateStamp();
+        };
+        fieldsWrap.querySelector(".price-input").oninput = (e) => {
+          ing.pricePerKg = e.target.value;
+          row.querySelector(".subtotal").textContent = fmtGs(ingredientCost(ing));
+          updateStamp();
+        };
+      }
+    }
+    renderFields();
+
+    row.querySelector(".name-input").oninput = (e) => { ing.name = e.target.value; };
+    row.querySelector(".mode-select").onchange = (e) => {
+      ing.mode = e.target.value;
+      renderFields();
+      row.querySelector(".subtotal").textContent = fmtGs(ingredientCost(ing));
+      updateStamp();
+    };
+    row.querySelector(".remove-btn").onclick = () => {
+      local.ingredients = local.ingredients.filter((_, i) => i !== idx);
+      buildBody();
+    };
+    return row;
+  }
+
+  buildBody();
+}
+
+// ---------- Print ----------
+function printRecipe(recipe, brand, scalePortions){
+  const qty = parseFloat(scalePortions) || 0;
+  const cost = recipeCost(recipe);
+  const area = document.getElementById("print-area");
+  const map = collectShoppingList(recipe, qty, []);
+  const rows = Object.values(map).map(i => {
+    const qtyLabel = i.units > 0
+      ? `${(Math.round(i.units*10)/10).toLocaleString("es-PY")} un.${i.grams > 0 ? ` + ${fmtWeight(i.grams)}` : ""}`
+      : fmtWeight(i.grams);
+    return `<tr><td>${i.name}</td><td>${qtyLabel}</td><td>${fmtGs(i.cost)}</td></tr>`;
+  }).join("");
+  const compNote = (recipe.components && recipe.components.length)
+    ? `<div class="p-meta">Incluye: ${recipe.components.map(c => {
+        const b = recipeById(c.baseId);
+        return b ? `${c.qty} × ${b.name}` : "";
+      }).filter(Boolean).join(" · ")}</div>`
+    : "";
+  area.innerHTML = `
+    <div class="p-brand">${brand ? brand.name.toUpperCase() : ""}</div>
+    <div class="p-title">${recipe.name || "Receta sin nombre"}</div>
+    <div class="p-meta">Rinde habitual: ${recipe.basePortions} unidades &nbsp;·&nbsp; Produciendo hoy: ${qty} unidades</div>
+    ${compNote}
+    <table>
+      <thead><tr><th>Ingrediente (total, incluye bases)</th><th>Cantidad a comprar</th><th>Costo total</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="p-total">Costo por unidad: ${fmtGs(cost)} &nbsp;·&nbsp; Costo total del lote: ${fmtGs(cost*qty)}</div>
+    ${recipe.notes ? `<div class="p-notes"><b>Notas:</b>\n${recipe.notes}</div>` : ""}
+  `;
+  window.print();
+}
+
+loadData();
+</script>
+</body>
+</html>
