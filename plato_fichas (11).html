@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plato · Fichas Técnicas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F4EF;
+    --cream-dark: #EDE8DF;
+    --green-dark: #2D4A2E;
+    --green-sage: #6E9B6B;
+    --green-light: #EAF4E8;
+    --amber: #B8851E;
+    --amber-light: #FDF3E0;
+    --text: #1A1A18;
+    --text-muted: #5C6B5D;
+    --border: #DDD8CF;
+    --white: #FFFFFF;
+    --red: #B84040;
+    --red-light: #FBEAEA;
+  }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HEADER */
+  header {
+    background: #1E321F;
+    padding: 20px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #3D6B3F;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 900;
+    color: #FFFFFF;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+  .logo-dot {
+    width: 9px; height: 9px;
+    background: #8DC98A;
+    border-radius: 50%;
+    margin-bottom: 7px;
+    flex-shrink: 0;
+  }
+  .logo-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #8DC98A;
+    margin-left: 3px;
+    margin-bottom: 2px;
+    align-self: flex-end;
+  }
+  .header-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    font-weight: 400;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+  /* MARCAS / TABS */
+  .brands-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .brand-tab {
+    padding: 8px 20px;
+    border-radius: 24px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+  }
+  .brand-tab .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .brand-tab.active { background: var(--green-dark); color: #FFFFFF; border-color: var(--green-dark); font-weight: 600; }
+  .brand-tab:hover:not(.active) { border-color: var(--green-sage); color: var(--green-dark); background: var(--green-light); }
+  .btn-add-brand {
+    padding: 7px 16px;
+    border-radius: 24px;
+    border: 1.5px dashed var(--border);
+    background: transparent;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+  }
+  .btn-add-brand:hover { border-color: var(--green-sage); color: var(--green-dark); }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .brand-count { font-size: 14px; color: var(--text-muted); }
+  .brand-count span { font-weight: 600; color: var(--green-dark); }
+  .btn { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: 'Jost', sans-serif; transition: all .15s; }
+  .btn-primary { background: var(--green-dark); color: var(--cream); }
+  .btn-primary:hover { background: #1E3320; }
+  .btn-secondary { background: var(--white); color: var(--text); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--green-sage); }
+  .btn-ghost { background: transparent; color: var(--text-muted); font-size: 13px; }
+  .btn-ghost:hover { color: var(--green-dark); }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  /* CARDS GRID */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+
+  .recipe-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    padding: 20px;
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .recipe-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--green-dark) 0px, var(--green-dark) 6px, var(--green-sage) 6px, var(--green-sage) 12px);
+  }
+  .recipe-card.base::before {
+    background: repeating-linear-gradient(90deg, var(--amber) 0px, var(--amber) 6px, var(--amber-light) 6px, var(--amber-light) 12px);
+  }
+  .recipe-card:hover { border-color: var(--green-sage); box-shadow: 0 4px 16px rgba(45,74,46,0.1); transform: translateY(-1px); }
+
+  .card-brand {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .card-badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--amber-light);
+    color: var(--amber);
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .card-name { font-size: 19px; font-weight: 700; font-family: 'Playfair Display', serif; color: #1A1A18; margin-bottom: 6px; line-height: 1.3; }
+  .card-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+  .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+  .card-cost-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+  .card-cost { font-size: 21px; font-weight: 700; color: var(--green-dark); }
+  .card-margin { font-size: 14px; font-weight: 700; color: var(--green-sage); }
+
+  /* MODAL OVERLAY */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(30,44,31,0.45);
+    z-index: 100;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  .overlay.open { display: flex; }
+
+  .modal {
+    background: var(--cream);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 680px;
+    margin: auto;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    background: #1E321F;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #3D6B3F;
+  }
+  .modal-header h2 { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.75); font-weight: 500; }
+  .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; line-height: 1; }
+  .modal-close:hover { color: white; }
+
+  .modal-body { padding: 28px; }
+
+  .form-row { margin-bottom: 20px; }
+  .form-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Jost', sans-serif;
+    background: var(--white);
+    color: #1A1A18;
+    transition: border-color .15s;
+    line-height: 1.4;
+  }
+  .form-input:focus { outline: none; border-color: var(--green-sage); }
+  .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238BA888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+
+  .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--green-dark); cursor: pointer; }
+  .checkbox-row label { font-size: 13px; color: var(--text-muted); cursor: pointer; }
+
+  /* RINDE BOX */
+  .rinde-box {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+  .rinde-box-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; font-weight: 500; }
+  .rinde-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .rinde-input-wrap { display: flex; align-items: center; gap: 8px; }
+  .rinde-input-wrap label { font-size: 12px; color: var(--text-muted); }
+  .rinde-input { width: 70px; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: 'Jost', sans-serif; background: var(--white); }
+  .rinde-btn { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--white); font-size: 12px; cursor: pointer; font-family: 'Jost', sans-serif; transition: all .15s; }
+  .rinde-btn:hover, .rinde-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+
+  /* INGREDIENTES */
+  .section-divider { height: 1px; background: var(--border); margin: 22px 0; }
+  .ingredients-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .ingredient-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 80px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .ingredient-cost { font-size: 13px; font-weight: 600; color: var(--green-dark); text-align: right; }
+  .btn-remove { background: none; border: none; color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Jost', sans-serif; }
+  .btn-remove:hover { color: #8B2020; }
+  .btn-add { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; border: 1.5px dashed var(--border); background: transparent; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'Jost', sans-serif; }
+  .btn-add:hover { border-color: var(--green-sage); color: var(--green-dark); }
+
+  /* BASES */
+  .bases-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .base-row {
+    display: grid;
+    grid-template-columns: 150px 110px 100px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    background: var(--amber-light);
+    border: 1.5px solid #E8C98A;
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .base-note { font-size: 11px; color: var(--amber); }
+  .base-cost { font-size: 13px; font-weight: 600; color: var(--amber); text-align: right; }
+
+  /* COSTO TOTAL */
+  .cost-bar {
+    background: #1E321F;
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border: 1.5px solid #2D4A2E;
+  }
+  .cost-bar-item { text-align: center; }
+  .cost-bar-label { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 6px; font-weight: 500; }
+  .cost-bar-value { font-size: 26px; font-weight: 700; color: #FFFFFF; font-family: 'Playfair Display', serif; }
+
+  /* PRECIO Y MARGEN */
+  .precio-box {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .precio-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+  .margen-row { font-size: 14px; color: var(--text-muted); line-height: 2; }
+  .margen-highlight { color: #1E321F; font-weight: 700; }
+  .margen-pct { color: #4A8A47; font-weight: 700; font-size: 16px; }
+
+  /* LISTA DE COMPRAS */
+  .compras-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+  .compra-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .compra-row:last-child { border-bottom: none; }
+  .compra-qty { color: var(--text-muted); font-size: 12px; }
+  .compra-cost { font-weight: 700; color: #2D4A2E; }
+
+  /* MODAL FOOTER */
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px;
+    border-top: 1px solid var(--border);
+    background: var(--white);
+  }
+  .modal-footer-left { display: flex; gap: 12px; }
+  .btn-danger { background: none; border: none; color: var(--red); font-size: 13px; cursor: pointer; font-family: 'Jost', sans-serif; }
+  .btn-danger:hover { text-decoration: underline; }
+  .btn-print { background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: 'Jost', sans-serif; }
+  .btn-print:hover { color: var(--green-dark); }
+  .modal-footer-right { display: flex; gap: 10px; }
+
+  textarea.form-input { resize: vertical; min-height: 72px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="logo">plato<div class="logo-dot"></div><span class="logo-sub">viandas</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-title">Recetario de Producción · Fichas Técnicas</div>
+    <span id="syncStatus" style="font-size:12px; color:#C8973A; font-family:'Jost',sans-serif;">⟳ Conectando...</span>
+    <button onclick="if(confirm('¿Resetear todos los datos a los valores originales?')){if(db){db.collection('plato').doc('estado').set(DEFAULT_STATE).then(()=>location.reload());}else{location.reload();}}" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);font-size:11px;padding:4px 10px;border-radius:12px;cursor:pointer;font-family:Jost,sans-serif;">↺ Resetear</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- NAV PRINCIPAL -->
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <div style="display:flex; gap:8px;">
+      <button class="brand-tab" id="navRecetas" onclick="setView('recetas')" style="font-size:14px;">📋 Recetas</button>
+      <button class="brand-tab" id="navIngredientes" onclick="setView('ingredientes')" style="font-size:14px;">🧂 Ingredientes</button>
+    </div>
+  </div>
+
+  <!-- VISTA RECETAS -->
+  <div id="viewRecetas">
+    <!-- LÍNEA: ALMUERZO / CENA -->
+    <div class="brands-bar" id="brandsBar"></div>
+    <!-- SEMANAS -->
+    <div class="brands-bar" id="weeksBar" style="margin-top:-10px; margin-bottom:20px;"></div>
+  </div>
+
+  </div><!-- /viewRecetas -->
+
+  <!-- VISTA INGREDIENTES -->
+  <div id="viewIngredientes" style="display:none;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <div style="font-size:22px; font-family:'Playfair Display',serif; font-weight:700; color:#1A1A18; margin-bottom:4px;">Ingredientes maestros</div>
+        <div style="font-size:13px; color:var(--text-muted);">Actualizá el precio una vez y se aplica a todas las recetas automáticamente.</div>
+      </div>
+      <button class="btn btn-primary" onclick="addIngredienteMaestro()">+ Nuevo ingrediente</button>
+    </div>
+
+    <!-- SEARCH -->
+    <div style="position:relative; margin-bottom:20px;">
+      <input class="form-input" id="ingSearch" placeholder="Buscar ingrediente..." oninput="renderIngredientes()" style="padding-left:36px;">
+      <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:16px;">🔍</span>
+    </div>
+
+    <!-- TABLE -->
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="padding:14px 20px; background:#1E321F; color:#fff; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:left;">Ingrediente</th>
+            <th style="padding:14px 20px; background:#1E321F; color:#fff; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:left; width:160px;">Unidad</th>
+            <th style="padding:14px 20px; background:#1E321F; color:#fff; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:right; width:200px;">Precio (Gs.)</th>
+            <th style="padding:14px 20px; background:#1E321F; color:#fff; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:center; width:80px;">Usado en</th>
+            <th style="padding:14px 20px; background:#1E321F; width:50px;"></th>
+          </tr>
+        </thead>
+        <tbody id="ingredientesTableBody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px; font-size:12px; color:var(--text-muted);">
+      💡 Al cambiar un precio acá, el costo de todas las recetas que usan ese ingrediente se actualiza al instante.
+    </div>
+  </div>
+
+  <!-- TOOLBAR RECETAS -->
+  <div id="toolbarRecetas">
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="brand-count" id="brandCount"></span>
+      <button class="btn btn-secondary" onclick="openModal(null, true)">+ Preparación base</button>
+      <button class="btn btn-primary" onclick="openModal(null, false)">+ Nueva receta</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" onclick="editBrand()">Editar línea</button>
+      <button class="btn btn-ghost" style="color:var(--red)" onclick="deleteBrand()">Eliminar línea</button>
+    </div>
+  </div>
+
+  <!-- VISTA SEMANAL -->
+  <div id="weekTableSection" style="display:none; margin-bottom:32px;">
+    <div class="section-label" id="weekTableLabel"></div>
+    <div style="overflow-x:auto;">
+      <table id="weekTable" style="width:100%; border-collapse:collapse; background:var(--white); border-radius:14px; overflow:hidden; border:1.5px solid var(--border);">
+        <thead>
+          <tr>
+            <th style="padding:12px 16px; background:#1E321F; color:#FFFFFF; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:left; width:90px;">Día</th>
+            <th style="padding:12px 16px; background:#1E321F; color:#FFFFFF; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:left;">Plato</th>
+            <th style="padding:12px 16px; background:#1E321F; color:#FFFFFF; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:right; width:150px;">Costo / porción</th>
+            <th style="padding:12px 16px; background:#1E321F; color:#FFFFFF; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; font-weight:500; text-align:right; width:100px;">Margen</th>
+            <th style="padding:12px 16px; background:var(--green-dark); width:60px;"></th>
+          </tr>
+        </thead>
+        <tbody id="weekTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CARDS (vista todas) -->
+  <div id="basesSection">
+    <div class="section-label">Preparaciones base</div>
+    <div class="cards-grid" id="basesGrid"></div>
+  </div>
+  <div id="recipesSection">
+    <div class="section-label" id="recipesSectionLabel">Recetas</div>
+    <div class="cards-grid" id="recipesGrid"></div>
+  </div>
+
+</div>
+
+  </div><!-- /toolbarRecetas -->
+</div>
+
+<!-- MOVE MODAL -->
+<div class="overlay" id="moveOverlay" onclick="closeMoveModal(event)" style="display:none;">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <h2>Mover plato</h2>
+      <button class="modal-close" onclick="closeMoveModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:8px; font-size:14px; color:var(--text-muted);">Plato seleccionado:</div>
+      <div id="movePlateName" style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:#1A1A18; margin-bottom:24px;"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div>
+          <label class="form-label">Semana destino</label>
+          <select class="form-input form-select" id="moveWeek">
+            <option value="Semana 1">Semana 1</option>
+            <option value="Semana 2">Semana 2</option>
+            <option value="Semana 3">Semana 3</option>
+            <option value="Semana 4">Semana 4</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Día destino</label>
+          <select class="form-input form-select" id="moveDay">
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="moveConflictMsg" style="display:none; background:#FDF3E0; border:1.5px solid #E8C98A; border-radius:10px; padding:12px 16px; font-size:13px; color:#633806; margin-bottom:16px;">
+        ⚠️ Ya hay un plato ese día. Si confirmás, se van a intercambiar los dos platos.
+      </div>
+
+      <div id="movePreview" style="background:var(--green-light); border-radius:10px; padding:12px 16px; font-size:13px; color:#2D4A2E; margin-bottom:8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <div></div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeMoveModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmMove()">Confirmar movimiento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Nueva receta</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <label class="form-label">Línea</label>
+          <select class="form-input form-select" id="mBrand"></select>
+        </div>
+        <div>
+          <label class="form-label">Nombre del plato</label>
+          <input class="form-input" id="mName" placeholder="Ej: Milanesas de pollo">
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="mIsBase" onchange="toggleBase()">
+        <label for="mIsBase">Es una <strong>preparación base</strong> (ej: salsa, caldo, masa)</label>
+      </div>
+
+      <!-- RINDE -->
+      <div class="rinde-box">
+        <div class="rinde-box-title">¿Cuántas porciones vas a producir?</div>
+        <div class="rinde-row">
+          <div class="rinde-input-wrap">
+            <label>Rinde:</label>
+            <input class="rinde-input form-input" id="mRinde" type="number" value="10" oninput="recalc()">
+            <label>porciones</label>
+          </div>
+          <button class="rinde-btn" onclick="setRinde(5)">5</button>
+          <button class="rinde-btn" onclick="setRinde(10)">10</button>
+          <button class="rinde-btn" onclick="setRinde(20)">20</button>
+          <button class="rinde-btn" onclick="setRinde(30)">30</button>
+          <button class="rinde-btn" onclick="setRinde(50)">50</button>
+        </div>
+      </div>
+
+      <!-- INGREDIENTES -->
+      <div class="section-label">Ingredientes</div>
+      <div class="ingredients-list" id="ingredientsList"></div>
+      <button class="btn-add" onclick="addIngredient()">+ Agregar ingrediente</button>
+
+      <div class="section-divider"></div>
+
+      <!-- BASES USADAS -->
+      <div class="section-label">Preparaciones base que usa</div>
+      <div class="bases-list" id="basesList"></div>
+      <button class="btn-add" onclick="addBase()">+ Agregar preparación base</button>
+
+      <div class="section-divider"></div>
+
+      <!-- NOTAS -->
+      <div class="form-row">
+        <label class="form-label">Notas / procedimiento (opcional)</label>
+        <textarea class="form-input" id="mNotes" placeholder="Pasos de preparación, tips, tiempos..."></textarea>
+      </div>
+
+      <!-- COSTO TOTAL -->
+      <div class="cost-bar" id="costBar">
+        <div class="cost-bar-item">
+          <div class="cost-bar-label">Costo por porción</div>
+          <div class="cost-bar-value" id="costUnit">Gs. 0</div>
+        </div>
+        <div class="cost-bar-item">
+          <div class="cost-bar-label">Costo total del lote</div>
+          <div class="cost-bar-value" id="costTotal">Gs. 0</div>
+        </div>
+      </div>
+
+      <!-- PRECIO Y MARGEN -->
+      <div class="precio-box">
+        <div class="section-label" style="margin-bottom:12px;">Precio de venta y margen</div>
+        <div class="precio-row">
+          <div>
+            <label class="form-label">Precio de venta (Gs.)</label>
+            <input class="form-input" id="mPrecio" type="number" placeholder="Ej: 45000" oninput="recalc()">
+          </div>
+          <div>
+            <label class="form-label">Otros costos fijos (Gs.) — caja, bolsa, envío...</label>
+            <input class="form-input" id="mComision" type="number" value="0" placeholder="Ej: 2500" oninput="recalc()">
+          </div>
+        </div>
+        <div class="margen-row" id="margenInfo">—</div>
+      </div>
+
+      <!-- LISTA DE COMPRAS -->
+      <div class="section-label" id="comprasLabel">Lista de compras para <span id="comprasFor">10</span> porciones</div>
+      <div class="compras-list" id="comprasList"></div>
+
+    </div>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button class="btn-danger" onclick="deleteRecipe()">Eliminar receta</button>
+        <button class="btn-print" onclick="printRecipe()">🖨 Imprimir ficha</button>
+      </div>
+      <div class="modal-footer-right">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveRecipe()">Guardar receta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- STATE ----
+// ---- FIREBASE CONFIG ----
+// Firebase SDK cargado via CDN en el head
+
+const DEFAULT_STATE = {
+  brands: ['Almuerzo','Cena'],
+  brandColors: {'Almuerzo':'#2D4A2E','Cena':'#1a1a18'},
+  recipes: [
+    // ── SEMANA 1 · ALMUERZO (Fit + Gourmet de Panambí 27 jul–1 ago) ──
+    {id:1, brand:'Almuerzo', name:'Tarta de carne con verduritas y batatas', isBase:false, rinde:10, notes:'Semana 1 · Lunes. Base: Fit Panambí.', ingredients:[{name:'Carne molida',unit:'por peso (kg)',qty:1.5,pricePerUnit:32000},{name:'Verduras mixtas',unit:'por peso (kg)',qty:0.5,pricePerUnit:5000},{name:'Batata',unit:'por peso (kg)',qty:0.6,pricePerUnit:4000},{name:'Tapa de tarta',unit:'por unidad',qty:2,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:2, brand:'Almuerzo', name:'Boloñesa con polenta cremosa', isBase:false, rinde:10, notes:'Semana 1 · Martes. Base: Gourmet Panambí.', ingredients:[{name:'Carne molida',unit:'por peso (kg)',qty:1.5,pricePerUnit:32000},{name:'Tomate triturado',unit:'por peso (kg)',qty:0.8,pricePerUnit:6000},{name:'Harina de maíz (polenta)',unit:'por peso (kg)',qty:0.6,pricePerUnit:7000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.2,pricePerUnit:42000}], bases:[], precio:45000, comision:0},
+    {id:3, brand:'Almuerzo', name:'Pollo saltado en crema de espinacas con fideos integrales', isBase:false, rinde:10, notes:'Semana 1 · Miércoles. Base: Fit Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Espinaca',unit:'por peso (kg)',qty:0.4,pricePerUnit:6000},{name:'Crema de leche',unit:'por litro',qty:0.3,pricePerUnit:18000},{name:'Fideos integrales',unit:'por peso (kg)',qty:0.8,pricePerUnit:10000}], bases:[], precio:45000, comision:0},
+    {id:4, brand:'Almuerzo', name:'Paellita de pollo con verduritas', isBase:false, rinde:10, notes:'Semana 1 · Jueves. Base: Gourmet Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.5,pricePerUnit:35000},{name:'Arroz',unit:'por peso (kg)',qty:0.8,pricePerUnit:9000},{name:'Verduras mixtas (morrón, arvejas)',unit:'por peso (kg)',qty:0.5,pricePerUnit:6000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:10000}], bases:[], precio:45000, comision:0},
+    {id:5, brand:'Almuerzo', name:'Pollo a la criolla con mandioca', isBase:false, rinde:10, notes:'Semana 1 · Viernes. Base: Fit Panambí.', ingredients:[{name:'Muslo de pollo',unit:'por peso (kg)',qty:2,pricePerUnit:28000},{name:'Mandioca',unit:'por peso (kg)',qty:0.8,pricePerUnit:4000},{name:'Cebolla y tomate',unit:'por peso (kg)',qty:0.4,pricePerUnit:4000},{name:'Condimentos criollos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+
+    // ── SEMANA 2 · ALMUERZO (Fit + Gourmet 3–7 ago) ──
+    {id:6, brand:'Almuerzo', name:'Pollo a la cacerola con puré de papa', isBase:false, rinde:10, notes:'Semana 2 · Lunes. Base: Fit Panambí.', ingredients:[{name:'Pollo trozado',unit:'por peso (kg)',qty:2,pricePerUnit:28000},{name:'Papa',unit:'por peso (kg)',qty:1,pricePerUnit:4000},{name:'Cebolla y morrón',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:7, brand:'Almuerzo', name:'Guisito de carne con fideo moñito', isBase:false, rinde:10, notes:'Semana 2 · Martes. Base: Gourmet Panambí.', ingredients:[{name:'Carne para guiso',unit:'por peso (kg)',qty:1.5,pricePerUnit:34000},{name:'Fideo moñito',unit:'por peso (kg)',qty:0.6,pricePerUnit:8000},{name:'Tomate y cebolla',unit:'por peso (kg)',qty:0.4,pricePerUnit:4000},{name:'Verduras mixtas',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000}], bases:[], precio:45000, comision:0},
+    {id:8, brand:'Almuerzo', name:'Medallones de pollo a la suiza con batatas asadas', isBase:false, rinde:10, notes:'Semana 2 · Miércoles. Base: Fit Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Batata',unit:'por peso (kg)',qty:0.8,pricePerUnit:4000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.2,pricePerUnit:42000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:9, brand:'Almuerzo', name:'Bondiola de cerdo a la mostaza con papas cremosas', isBase:false, rinde:10, notes:'Semana 2 · Jueves. Base: Gourmet Panambí.', ingredients:[{name:'Bondiola de cerdo',unit:'por peso (kg)',qty:2,pricePerUnit:38000},{name:'Papa',unit:'por peso (kg)',qty:1,pricePerUnit:4000},{name:'Mostaza y miel',unit:'por peso (kg)',qty:0.1,pricePerUnit:15000},{name:'Crema de leche',unit:'por litro',qty:0.2,pricePerUnit:18000}], bases:[], precio:45000, comision:0},
+    {id:10, brand:'Almuerzo', name:'Quesadilla de pollo con vegetales y ensalada caprese', isBase:false, rinde:10, notes:'Semana 2 · Viernes. Base: Fit Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.5,pricePerUnit:35000},{name:'Tortillas',unit:'por unidad',qty:10,pricePerUnit:1500},{name:'Morrón y cebolla',unit:'por peso (kg)',qty:0.4,pricePerUnit:5000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.3,pricePerUnit:42000}], bases:[], precio:45000, comision:0},
+
+    // ── SEMANA 3 · ALMUERZO (Fit + Gourmet 10–14 ago) ──
+    {id:11, brand:'Almuerzo', name:'Bifecitos de carne koygua con arroz quesu', isBase:false, rinde:10, notes:'Semana 3 · Lunes. Base: Fit Panambí.', ingredients:[{name:'Bife de paleta',unit:'por peso (kg)',qty:2,pricePerUnit:38000},{name:'Arroz',unit:'por peso (kg)',qty:0.8,pricePerUnit:9000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.2,pricePerUnit:42000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:12, brand:'Almuerzo', name:'Chupín de pollo con papas, arroz y arvejas', isBase:false, rinde:10, notes:'Semana 3 · Martes. Base: Gourmet Panambí.', ingredients:[{name:'Pollo trozado',unit:'por peso (kg)',qty:2,pricePerUnit:28000},{name:'Papa',unit:'por peso (kg)',qty:0.8,pricePerUnit:4000},{name:'Arroz',unit:'por peso (kg)',qty:0.5,pricePerUnit:9000},{name:'Arvejas',unit:'por peso (kg)',qty:0.3,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:13, brand:'Almuerzo', name:'Cerdo agridulce con puré de batata', isBase:false, rinde:10, notes:'Semana 3 · Miércoles. Base: Fit Panambí.', ingredients:[{name:'Lomo de cerdo',unit:'por peso (kg)',qty:2,pricePerUnit:36000},{name:'Batata',unit:'por peso (kg)',qty:0.8,pricePerUnit:4000},{name:'Salsa agridulce',unit:'por litro',qty:0.2,pricePerUnit:12000},{name:'Verduras',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000}], bases:[], precio:45000, comision:0},
+    {id:14, brand:'Almuerzo', name:'Bife de carne encebollado con papas a la provenzal', isBase:false, rinde:10, notes:'Semana 3 · Jueves. Base: Gourmet Panambí.', ingredients:[{name:'Bife de chorizo',unit:'por peso (kg)',qty:2,pricePerUnit:45000},{name:'Papa',unit:'por peso (kg)',qty:1,pricePerUnit:4000},{name:'Cebolla',unit:'por peso (kg)',qty:0.4,pricePerUnit:3500},{name:'Ajo y perejil',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:15, brand:'Almuerzo', name:'Pan de carne relleno con papas asadas', isBase:false, rinde:10, notes:'Semana 3 · Viernes. Base: Fit Panambí.', ingredients:[{name:'Carne molida',unit:'por peso (kg)',qty:1.5,pricePerUnit:32000},{name:'Papa',unit:'por peso (kg)',qty:1,pricePerUnit:4000},{name:'Huevo',unit:'por unidad',qty:3,pricePerUnit:2500},{name:'Verduras y condimentos',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000}], bases:[], precio:45000, comision:0},
+
+    // ── SEMANA 4 · ALMUERZO (Fit + Gourmet 17–21 ago) ──
+    {id:16, brand:'Almuerzo', name:'Pollo saltado en crema de espinacas con fideos', isBase:false, rinde:10, notes:'Semana 4 · Lunes. Base: Fit Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Espinaca',unit:'por peso (kg)',qty:0.4,pricePerUnit:6000},{name:'Fideos',unit:'por peso (kg)',qty:0.7,pricePerUnit:8000},{name:'Crema y queso',unit:'por peso (kg)',qty:0.3,pricePerUnit:20000}], bases:[], precio:45000, comision:0},
+    {id:17, brand:'Almuerzo', name:'Cazuela de pollo con polenta quesu', isBase:false, rinde:10, notes:'Semana 4 · Martes. Base: Gourmet Panambí.', ingredients:[{name:'Pollo trozado',unit:'por peso (kg)',qty:2,pricePerUnit:28000},{name:'Harina de maíz (polenta)',unit:'por peso (kg)',qty:0.6,pricePerUnit:7000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.3,pricePerUnit:42000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:18, brand:'Almuerzo', name:'Cubos de pollo con cúrcuma, verduritas y batatas', isBase:false, rinde:10, notes:'Semana 4 · Miércoles. Base: Fit Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Batata',unit:'por peso (kg)',qty:0.7,pricePerUnit:4000},{name:'Verduras mixtas',unit:'por peso (kg)',qty:0.4,pricePerUnit:5000},{name:'Cúrcuma y condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:12000}], bases:[], precio:45000, comision:0},
+    {id:19, brand:'Almuerzo', name:'Medallones de peceto en salsa pomarola con arroz', isBase:false, rinde:10, notes:'Semana 4 · Jueves. Base: Fit Panambí.', ingredients:[{name:'Peceto',unit:'por peso (kg)',qty:2,pricePerUnit:42000},{name:'Tomate triturado',unit:'por peso (kg)',qty:0.6,pricePerUnit:6000},{name:'Arroz',unit:'por peso (kg)',qty:0.8,pricePerUnit:9000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:45000, comision:0},
+    {id:20, brand:'Almuerzo', name:'Milanesa de pollo a la napolitana con arroz cremoso', isBase:false, rinde:10, notes:'Semana 4 · Viernes. Base: Gourmet Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:2,pricePerUnit:35000},{name:'Pan rallado',unit:'por peso (kg)',qty:0.4,pricePerUnit:12000},{name:'Tomate y queso',unit:'por peso (kg)',qty:0.4,pricePerUnit:10000},{name:'Arroz',unit:'por peso (kg)',qty:0.7,pricePerUnit:9000}], bases:[], precio:45000, comision:0},
+
+    // ── SEMANA 1 · CENA (Cena Light Panambí 27 jul–1 ago) ──
+    {id:21, brand:'Cena', name:'Bifecitos de carne con milhojas de vegetales', isBase:false, rinde:10, notes:'Semana 1 · Lunes. Base: Cena Light Panambí.', ingredients:[{name:'Bife de paleta',unit:'por peso (kg)',qty:1.5,pricePerUnit:38000},{name:'Verduras laminadas (zucchini, morrón)',unit:'por peso (kg)',qty:0.6,pricePerUnit:6000},{name:'Aceite de oliva',unit:'por litro',qty:0.1,pricePerUnit:35000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:38000, comision:0},
+    {id:22, brand:'Cena', name:'Wrap caesar con mayonesa suave', isBase:false, rinde:10, notes:'Semana 1 · Martes. Base: Cena Light Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.5,pricePerUnit:35000},{name:'Tortillas',unit:'por unidad',qty:10,pricePerUnit:1500},{name:'Lechuga y tomate',unit:'por peso (kg)',qty:0.4,pricePerUnit:5000},{name:'Mayonesa',unit:'por peso (kg)',qty:0.15,pricePerUnit:12000}], bases:[], precio:38000, comision:0},
+    {id:23, brand:'Cena', name:'Hamburguesa de carne con queso y ensalada mediterránea', isBase:false, rinde:10, notes:'Semana 1 · Miércoles. Base: Cena Light Panambí.', ingredients:[{name:'Carne molida',unit:'por peso (kg)',qty:1.5,pricePerUnit:32000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.2,pricePerUnit:42000},{name:'Lechuga, tomate, cebolla',unit:'por peso (kg)',qty:0.4,pricePerUnit:5000},{name:'Pan de hamburguesa',unit:'por unidad',qty:10,pricePerUnit:2000}], bases:[], precio:38000, comision:0},
+    {id:24, brand:'Cena', name:'Grille de pollo al orégano con crema de arvejas', isBase:false, rinde:10, notes:'Semana 1 · Jueves. Base: Cena Light Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Arvejas',unit:'por peso (kg)',qty:0.5,pricePerUnit:8000},{name:'Crema de leche',unit:'por litro',qty:0.2,pricePerUnit:18000},{name:'Orégano y condimentos',unit:'por peso (kg)',qty:0.03,pricePerUnit:15000}], bases:[], precio:38000, comision:0},
+    {id:25, brand:'Cena', name:'Soufflé de zapallo y espinaca con queso', isBase:false, rinde:10, notes:'Semana 1 · Viernes. Base: Cena Light Panambí.', ingredients:[{name:'Zapallo',unit:'por peso (kg)',qty:1,pricePerUnit:4000},{name:'Espinaca',unit:'por peso (kg)',qty:0.3,pricePerUnit:6000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.3,pricePerUnit:42000},{name:'Huevo',unit:'por unidad',qty:4,pricePerUnit:2500}], bases:[], precio:38000, comision:0},
+
+    // ── SEMANA 2 · CENA (Cena Light 3–7 ago) ──
+    {id:26, brand:'Cena', name:'Pan de pollo relleno con queso y verduritas', isBase:false, rinde:10, notes:'Semana 2 · Lunes. Base: Cena Light Panambí.', ingredients:[{name:'Carne molida de pollo',unit:'por peso (kg)',qty:1.5,pricePerUnit:30000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.3,pricePerUnit:42000},{name:'Verduras mixtas',unit:'por peso (kg)',qty:0.4,pricePerUnit:5000},{name:'Condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:8000}], bases:[], precio:38000, comision:0},
+    {id:27, brand:'Cena', name:'Cubos de pollo al ajillo con revuelto de vegetales', isBase:false, rinde:10, notes:'Semana 2 · Martes. Base: Cena Light Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Ajo',unit:'por peso (kg)',qty:0.05,pricePerUnit:12000},{name:'Verduras mixtas',unit:'por peso (kg)',qty:0.5,pricePerUnit:5000},{name:'Huevo',unit:'por unidad',qty:4,pricePerUnit:2500}], bases:[], precio:38000, comision:0},
+    {id:28, brand:'Cena', name:'Lomito árabe mixto con verdeos', isBase:false, rinde:10, notes:'Semana 2 · Miércoles. Base: Cena Light Panambí.', ingredients:[{name:'Lomo de cerdo',unit:'por peso (kg)',qty:1.5,pricePerUnit:36000},{name:'Carne vacuna',unit:'por peso (kg)',qty:0.5,pricePerUnit:38000},{name:'Verdeo y condimentos árabes',unit:'por peso (kg)',qty:0.2,pricePerUnit:8000},{name:'Pan árabe',unit:'por unidad',qty:10,pricePerUnit:1800}], bases:[], precio:38000, comision:0},
+    {id:29, brand:'Cena', name:'Soufflé de jamón y queso con ensalada verde', isBase:false, rinde:10, notes:'Semana 2 · Jueves. Base: Cena Light Panambí.', ingredients:[{name:'Jamón',unit:'por peso (kg)',qty:0.4,pricePerUnit:35000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.4,pricePerUnit:42000},{name:'Huevo',unit:'por unidad',qty:6,pricePerUnit:2500},{name:'Lechuga y verduras',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000}], bases:[], precio:38000, comision:0},
+    {id:30, brand:'Cena', name:'Zucchini relleno de pollo gratinado', isBase:false, rinde:10, notes:'Semana 2 · Viernes. Base: Cena Light Panambí.', ingredients:[{name:'Zucchini',unit:'por peso (kg)',qty:1.2,pricePerUnit:5000},{name:'Carne molida de pollo',unit:'por peso (kg)',qty:1,pricePerUnit:30000},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.3,pricePerUnit:42000},{name:'Tomate y condimentos',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000}], bases:[], precio:38000, comision:0},
+
+    // ── SEMANA 3 · CENA (Cena Light 10–14 ago) ──
+    {id:31, brand:'Cena', name:'Salteado de carne con sopa crema de calabaza', isBase:false, rinde:10, notes:'Semana 3 · Lunes. Base: Cena Light Panambí.', ingredients:[{name:'Carne vacuna',unit:'por peso (kg)',qty:1.2,pricePerUnit:38000},{name:'Calabaza',unit:'por peso (kg)',qty:0.8,pricePerUnit:4000},{name:'Crema de leche',unit:'por litro',qty:0.2,pricePerUnit:18000},{name:'Crutones integrales',unit:'por peso (kg)',qty:0.1,pricePerUnit:12000}], bases:[], precio:38000, comision:0},
+    {id:32, brand:'Cena', name:'Burrito de carne con guacamole y ensalada', isBase:false, rinde:10, notes:'Semana 3 · Martes. Base: Cena Light Panambí.', ingredients:[{name:'Carne molida',unit:'por peso (kg)',qty:1.2,pricePerUnit:32000},{name:'Tortillas',unit:'por unidad',qty:10,pricePerUnit:1500},{name:'Palta',unit:'por peso (kg)',qty:0.4,pricePerUnit:15000},{name:'Lechuga y tomate',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000}], bases:[], precio:38000, comision:0},
+    {id:33, brand:'Cena', name:'Grille de pollo con ratatouille de vegetales', isBase:false, rinde:10, notes:'Semana 3 · Miércoles. Base: Cena Light Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.8,pricePerUnit:35000},{name:'Tomate y zucchini',unit:'por peso (kg)',qty:0.5,pricePerUnit:5000},{name:'Morrón y berenjena',unit:'por peso (kg)',qty:0.4,pricePerUnit:6000},{name:'Hierbas provenzales',unit:'por peso (kg)',qty:0.03,pricePerUnit:15000}], bases:[], precio:38000, comision:0},
+    {id:34, brand:'Cena', name:'Bife de carne al curry con panache de verduras', isBase:false, rinde:10, notes:'Semana 3 · Jueves. Base: Cena Light Panambí.', ingredients:[{name:'Bife de paleta',unit:'por peso (kg)',qty:1.5,pricePerUnit:38000},{name:'Verduras variadas',unit:'por peso (kg)',qty:0.6,pricePerUnit:5000},{name:'Curry y condimentos',unit:'por peso (kg)',qty:0.05,pricePerUnit:20000},{name:'Aceite de coco',unit:'por litro',qty:0.1,pricePerUnit:25000}], bases:[], precio:38000, comision:0},
+    {id:35, brand:'Cena', name:'Salpicón de pollo con mayonesa suave', isBase:false, rinde:10, notes:'Semana 3 · Viernes. Base: Cena Light Panambí.', ingredients:[{name:'Pechuga de pollo cocida',unit:'por peso (kg)',qty:1.5,pricePerUnit:35000},{name:'Mayonesa',unit:'por peso (kg)',qty:0.2,pricePerUnit:12000},{name:'Arvejas y zanahoria',unit:'por peso (kg)',qty:0.4,pricePerUnit:5000},{name:'Condimentos',unit:'por peso (kg)',qty:0.03,pricePerUnit:8000}], bases:[], precio:38000, comision:0},
+
+    // ── SEMANA 4 · CENA (Cena Light 17–21 ago) ──
+    {id:36, brand:'Cena', name:'Hamburguesa de pollo con queso light', isBase:false, rinde:10, notes:'Semana 4 · Lunes. Base: Cena Light Panambí.', ingredients:[{name:'Carne molida de pollo',unit:'por peso (kg)',qty:1.5,pricePerUnit:30000},{name:'Queso light',unit:'por peso (kg)',qty:0.2,pricePerUnit:38000},{name:'Lechuga y tomate',unit:'por peso (kg)',qty:0.3,pricePerUnit:5000},{name:'Pan de hamburguesa',unit:'por unidad',qty:10,pricePerUnit:2000}], bases:[], precio:38000, comision:0},
+    {id:37, brand:'Cena', name:'Omelette de choclo con cebolla y ricota', isBase:false, rinde:10, notes:'Semana 4 · Martes. Base: Cena Light Panambí.', ingredients:[{name:'Huevo',unit:'por unidad',qty:12,pricePerUnit:2500},{name:'Choclo',unit:'por peso (kg)',qty:0.5,pricePerUnit:5000},{name:'Ricota',unit:'por peso (kg)',qty:0.4,pricePerUnit:18000},{name:'Cebolla',unit:'por peso (kg)',qty:0.3,pricePerUnit:3500}], bases:[], precio:38000, comision:0},
+    {id:38, brand:'Cena', name:'Bife de carne al orégano con ensalada caprese', isBase:false, rinde:10, notes:'Semana 4 · Miércoles. Base: Cena Light Panambí.', ingredients:[{name:'Bife de paleta',unit:'por peso (kg)',qty:1.5,pricePerUnit:38000},{name:'Tomate y mozzarella',unit:'por peso (kg)',qty:0.5,pricePerUnit:10000},{name:'Orégano y albahaca',unit:'por peso (kg)',qty:0.03,pricePerUnit:15000},{name:'Aceite de oliva',unit:'por litro',qty:0.05,pricePerUnit:35000}], bases:[], precio:38000, comision:0},
+    {id:39, brand:'Cena', name:'Ensalada Caesar de pollo con mayonesa suave', isBase:false, rinde:10, notes:'Semana 4 · Jueves. Base: Cena Light Panambí.', ingredients:[{name:'Pechuga de pollo',unit:'por peso (kg)',qty:1.5,pricePerUnit:35000},{name:'Lechuga romana',unit:'por peso (kg)',qty:0.5,pricePerUnit:6000},{name:'Mayonesa y limón',unit:'por peso (kg)',qty:0.2,pricePerUnit:12000},{name:'Crutones y parmesano',unit:'por peso (kg)',qty:0.15,pricePerUnit:18000}], bases:[], precio:38000, comision:0},
+    {id:40, brand:'Cena', name:'Tartaleta de cebolla con queso y huevo duro', isBase:false, rinde:10, notes:'Semana 4 · Viernes. Base: Cena Light Panambí.', ingredients:[{name:'Cebolla',unit:'por peso (kg)',qty:0.8,pricePerUnit:3500},{name:'Queso Paraguay',unit:'por peso (kg)',qty:0.3,pricePerUnit:42000},{name:'Huevo',unit:'por unidad',qty:6,pricePerUnit:2500},{name:'Tapa de tarta',unit:'por unidad',qty:2,pricePerUnit:8000}], bases:[], precio:38000, comision:0},
+  ],
+  nextId: 41,
+  ingredientesMaestros: [
+    {id:1, name:'Aceite de coco', unit:'por litro', price:25000},
+    {id:2, name:'Aceite de oliva', unit:'por litro', price:35000},
+    {id:3, name:'Ajo', unit:'por peso (kg)', price:12000},
+    {id:4, name:'Ajo y perejil', unit:'por peso (kg)', price:8000},
+    {id:5, name:'Arroz', unit:'por peso (kg)', price:9000},
+    {id:6, name:'Arvejas', unit:'por peso (kg)', price:8000},
+    {id:7, name:'Arvejas y zanahoria', unit:'por peso (kg)', price:5000},
+    {id:8, name:'Batata', unit:'por peso (kg)', price:4000},
+    {id:9, name:'Bife de chorizo', unit:'por peso (kg)', price:45000},
+    {id:10, name:'Bife de paleta', unit:'por peso (kg)', price:38000},
+    {id:11, name:'Bondiola de cerdo', unit:'por peso (kg)', price:38000},
+    {id:12, name:'Calabaza', unit:'por peso (kg)', price:4000},
+    {id:13, name:'Carne molida', unit:'por peso (kg)', price:32000},
+    {id:14, name:'Carne molida de pollo', unit:'por peso (kg)', price:30000},
+    {id:15, name:'Carne para guiso', unit:'por peso (kg)', price:34000},
+    {id:16, name:'Carne vacuna', unit:'por peso (kg)', price:38000},
+    {id:17, name:'Cebolla', unit:'por peso (kg)', price:3500},
+    {id:18, name:'Cebolla y morrón', unit:'por peso (kg)', price:5000},
+    {id:19, name:'Cebolla y tomate', unit:'por peso (kg)', price:4000},
+    {id:20, name:'Choclo', unit:'por peso (kg)', price:5000},
+    {id:21, name:'Condimentos', unit:'por peso (kg)', price:8000},
+    {id:22, name:'Condimentos criollos', unit:'por peso (kg)', price:8000},
+    {id:23, name:'Crema de leche', unit:'por litro', price:18000},
+    {id:24, name:'Crema y queso', unit:'por peso (kg)', price:20000},
+    {id:25, name:'Crutones integrales', unit:'por peso (kg)', price:12000},
+    {id:26, name:'Crutones y parmesano', unit:'por peso (kg)', price:18000},
+    {id:27, name:'Curry y condimentos', unit:'por peso (kg)', price:20000},
+    {id:28, name:'Cúrcuma y condimentos', unit:'por peso (kg)', price:12000},
+    {id:29, name:'Espinaca', unit:'por peso (kg)', price:6000},
+    {id:30, name:'Fideo moñito', unit:'por peso (kg)', price:8000},
+    {id:31, name:'Fideos', unit:'por peso (kg)', price:8000},
+    {id:32, name:'Fideos integrales', unit:'por peso (kg)', price:10000},
+    {id:33, name:'Harina de maíz (polenta)', unit:'por peso (kg)', price:7000},
+    {id:34, name:'Hierbas provenzales', unit:'por peso (kg)', price:15000},
+    {id:35, name:'Huevo', unit:'por unidad', price:2500},
+    {id:36, name:'Jamón', unit:'por peso (kg)', price:35000},
+    {id:37, name:'Lechuga romana', unit:'por peso (kg)', price:6000},
+    {id:38, name:'Lechuga y tomate', unit:'por peso (kg)', price:5000},
+    {id:39, name:'Lechuga y verduras', unit:'por peso (kg)', price:5000},
+    {id:40, name:'Lechuga, tomate, cebolla', unit:'por peso (kg)', price:5000},
+    {id:41, name:'Lomo de cerdo', unit:'por peso (kg)', price:36000},
+    {id:42, name:'Mandioca', unit:'por peso (kg)', price:4000},
+    {id:43, name:'Mayonesa', unit:'por peso (kg)', price:12000},
+    {id:44, name:'Mayonesa y limón', unit:'por peso (kg)', price:12000},
+    {id:45, name:'Morrón y berenjena', unit:'por peso (kg)', price:6000},
+    {id:46, name:'Morrón y cebolla', unit:'por peso (kg)', price:5000},
+    {id:47, name:'Mostaza y miel', unit:'por peso (kg)', price:15000},
+    {id:48, name:'Muslo de pollo', unit:'por peso (kg)', price:28000},
+    {id:49, name:'Orégano y albahaca', unit:'por peso (kg)', price:15000},
+    {id:50, name:'Orégano y condimentos', unit:'por peso (kg)', price:15000},
+    {id:51, name:'Palta', unit:'por peso (kg)', price:15000},
+    {id:52, name:'Pan de hamburguesa', unit:'por unidad', price:2000},
+    {id:53, name:'Pan rallado', unit:'por peso (kg)', price:12000},
+    {id:54, name:'Pan árabe', unit:'por unidad', price:1800},
+    {id:55, name:'Papa', unit:'por peso (kg)', price:4000},
+    {id:56, name:'Peceto', unit:'por peso (kg)', price:42000},
+    {id:57, name:'Pechuga de pollo', unit:'por peso (kg)', price:35000},
+    {id:58, name:'Pechuga de pollo cocida', unit:'por peso (kg)', price:35000},
+    {id:59, name:'Pollo trozado', unit:'por peso (kg)', price:28000},
+    {id:60, name:'Queso Paraguay', unit:'por peso (kg)', price:42000},
+    {id:61, name:'Queso light', unit:'por peso (kg)', price:38000},
+    {id:62, name:'Ricota', unit:'por peso (kg)', price:18000},
+    {id:63, name:'Salsa agridulce', unit:'por litro', price:12000},
+    {id:64, name:'Tapa de tarta', unit:'por unidad', price:8000},
+    {id:65, name:'Tomate triturado', unit:'por peso (kg)', price:6000},
+    {id:66, name:'Tomate y cebolla', unit:'por peso (kg)', price:4000},
+    {id:67, name:'Tomate y condimentos', unit:'por peso (kg)', price:5000},
+    {id:68, name:'Tomate y mozzarella', unit:'por peso (kg)', price:10000},
+    {id:69, name:'Tomate y queso', unit:'por peso (kg)', price:10000},
+    {id:70, name:'Tomate y zucchini', unit:'por peso (kg)', price:5000},
+    {id:71, name:'Tortillas', unit:'por unidad', price:1500},
+    {id:72, name:'Verdeo y condimentos árabes', unit:'por peso (kg)', price:8000},
+    {id:73, name:'Verduras', unit:'por peso (kg)', price:5000},
+    {id:74, name:'Verduras laminadas (zucchini, morrón)', unit:'por peso (kg)', price:6000},
+    {id:75, name:'Verduras mixtas', unit:'por peso (kg)', price:5000},
+    {id:76, name:'Verduras mixtas (morrón, arvejas)', unit:'por peso (kg)', price:6000},
+    {id:77, name:'Verduras variadas', unit:'por peso (kg)', price:5000},
+    {id:78, name:'Verduras y condimentos', unit:'por peso (kg)', price:5000},
+    {id:79, name:'Zapallo', unit:'por peso (kg)', price:4000},
+    {id:80, name:'Zucchini', unit:'por peso (kg)', price:5000}
+  ]
+};
+
+// ---- FIREBASE INIT ----
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let db = null;
+let isSaving = false;
+
+function initFirebase() {
+  try {
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1046CVZViSQJ_QdSR9pEE20Fd0NtK6So",
+      authDomain: "fichas-tecnicas-plato.firebaseapp.com",
+      projectId: "fichas-tecnicas-plato",
+      storageBucket: "fichas-tecnicas-plato.firebasestorage.app",
+      messagingSenderId: "929478346573",
+      appId: "1:929478346573:web:a6a71e824438d918315904"
+    };
+
+    const fireApp = firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    showSyncStatus('connecting');
+
+    const docRef = db.collection('plato').doc('estado');
+    docRef.onSnapshot((snap) => {
+      if (snap.exists) {
+        if (!isSaving) {
+          state = snap.data();
+          render();
+          if (currentView === 'ingredientes') renderIngredientes();
+        }
+        showSyncStatus('synced');
+      } else {
+        // Primera vez: guardar estado por defecto
+        docRef.set(DEFAULT_STATE).then(() => {
+          state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+          showSyncStatus('synced');
+          render();
+        });
+      }
+    }, (err) => {
+      console.error('Firestore error:', err);
+      showSyncStatus('error');
+    });
+
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    showSyncStatus('error');
+  }
+}
+
+function save() {
+  showSyncStatus('saving');
+  if (!db) { showSyncStatus('error'); return; }
+  isSaving = true;
+  db.collection('plato').doc('estado').set(state)
+    .then(() => { showSyncStatus('synced'); })
+    .catch((e) => { console.error('Save error:', e); showSyncStatus('error'); });
+  setTimeout(() => { isSaving = false; }, 600);
+}
+
+function showSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  const map = {
+    connecting: { text: '⟳ Conectando...', color: '#C8973A' },
+    synced:     { text: '✓ Guardado en la nube', color: '#4A8A47' },
+    saving:     { text: '⟳ Guardando...', color: '#C8973A' },
+    error:      { text: '✕ Sin conexión — guardando local', color: '#B84040' },
+  };
+  const s = map[status] || map.synced;
+  el.textContent = s.text;
+  el.style.color = s.color;
+}
+
+let activeBrand = state.brands[0];
+let activeWeek = 'Todas';
+let editingId = null;
+let ingredientCount = 0;
+let baseCount = 0;
+
+const WEEKS = ['Todas', 'Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
+const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+
+function getWeekNumber(r) {
+  const n = r.notes || '';
+  if (n.includes('Semana 1')) return 1;
+  if (n.includes('Semana 2')) return 2;
+  if (n.includes('Semana 3')) return 3;
+  if (n.includes('Semana 4')) return 4;
+  return 0;
+}
+
+function getDayNumber(r) {
+  const n = r.notes || '';
+  if (n.includes('Lunes')) return 0;
+  if (n.includes('Martes')) return 1;
+  if (n.includes('Miércoles')) return 2;
+  if (n.includes('Jueves')) return 3;
+  if (n.includes('Viernes')) return 4;
+  return 5;
+}
+
+// save() is now handled by Firebase above
+
+function fmt(n) { return 'Gs. ' + Math.round(n).toLocaleString('es-PY'); }
+
+// ---- RENDER ----
+function render() {
+  // --- BRANDS BAR ---
+  const bar = document.getElementById('brandsBar');
+  bar.innerHTML = '';
+  state.brands.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'brand-tab' + (b === activeBrand ? ' active' : '');
+    btn.onclick = () => { activeBrand = b; activeWeek = 'Todas'; render(); };
+    const color = state.brandColors[b] || '#2D4A2E';
+    btn.innerHTML = `<span class="dot" style="background:${color}"></span> ${b}`;
+    bar.appendChild(btn);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn-add-brand';
+  addBtn.textContent = '+ Línea';
+  addBtn.onclick = addBrand;
+  bar.appendChild(addBtn);
+
+  // --- WEEKS BAR ---
+  const wb = document.getElementById('weeksBar');
+  wb.innerHTML = '';
+  WEEKS.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'brand-tab' + (w === activeWeek ? ' active' : '');
+    btn.style.fontSize = '12px';
+    btn.style.padding = '5px 14px';
+    if (w === activeWeek) { btn.style.background = '#8BA888'; btn.style.borderColor = '#8BA888'; }
+    btn.onclick = () => { activeWeek = w; render(); };
+    btn.textContent = w;
+    wb.appendChild(btn);
+  });
+
+  const allInBrand = state.recipes.filter(r => r.brand === activeBrand);
+  const filtered = activeWeek === 'Todas'
+    ? allInBrand
+    : allInBrand.filter(r => (r.notes || '').includes(activeWeek));
+
+  const bases = filtered.filter(r => r.isBase);
+  const nonBases = filtered.filter(r => !r.isBase).sort((a,b) => getDayNumber(a) - getDayNumber(b));
+
+  const weekNum = activeWeek === 'Todas' ? '' : activeWeek.replace('Semana ','');
+  document.getElementById('brandCount').innerHTML =
+    `<span>${filtered.length}</span> recetas · <strong>${activeBrand}</strong>${activeWeek !== 'Todas' ? ' · <strong>' + activeWeek + '</strong>' : ''}`;
+
+  // --- WEEK TABLE VIEW ---
+  const tableSection = document.getElementById('weekTableSection');
+  const cardsSection = document.getElementById('recipesSection');
+  const basesSection = document.getElementById('basesSection');
+
+  if (activeWeek !== 'Todas' && nonBases.length > 0) {
+    tableSection.style.display = 'block';
+    cardsSection.style.display = 'none';
+    basesSection.style.display = bases.length ? 'block' : 'none';
+
+    document.getElementById('weekTableLabel').textContent =
+      `${activeBrand} · ${activeWeek} — Lunes a Viernes`;
+
+    const tbody = document.getElementById('weekTableBody');
+    tbody.innerHTML = '';
+    const days = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
+    days.forEach((day, i) => {
+      const r = nonBases.find(x => getDayNumber(x) === i);
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border)';
+      if (!r) {
+        tr.innerHTML = `
+          <td style="padding:14px 16px; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--green-sage);">${day}</td>
+          <td colspan="4" style="padding:14px 16px; font-size:13px; color:var(--text-muted); font-style:italic;">Sin asignar</td>
+        `;
+      } else {
+        const cost = calcCostUnit(r);
+        const totalCostoR = cost + (r.comision || 0);
+        const pct = r.precio > 0 ? (((r.precio - totalCostoR) / r.precio)*100).toFixed(1)+'%' : '—';
+        const isEven = i % 2 === 0;
+        tr.style.background = isEven ? 'var(--white)' : 'var(--cream)';
+        tr.innerHTML = `
+          <td style="padding:14px 16px; font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:#2D4A2E;">${day}</td>
+          <td style="padding:14px 16px; font-size:16px; font-family:'Playfair Display',serif; font-weight:700; color:#1A1A18; cursor:pointer;" onclick="openModal(${r.id}, false)">${r.name}</td>
+          <td style="padding:14px 16px; font-size:15px; font-weight:700; color:#2D4A2E; text-align:right;">${fmt(cost)}</td>
+          <td style="padding:14px 16px; font-size:15px; font-weight:700; color:#4A8A47; text-align:right;">${pct}</td>
+          <td style="padding:14px 16px; text-align:center; display:flex; gap:6px; justify-content:center;">
+            <button onclick="openModal(${r.id}, false)" style="background:none; border:1.5px solid var(--border); border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; color:var(--text-muted);" title="Editar">✎</button>
+            <button onclick="openMoveModal(${r.id})" style="background:none; border:1.5px solid var(--border); border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; color:var(--text-muted);" title="Mover a otro día/semana">⇄</button>
+          </td>
+        `;
+      }
+      tbody.appendChild(tr);
+    });
+
+    // bases
+    const bg = document.getElementById('basesGrid');
+    bg.innerHTML = '';
+    bases.forEach(r => bg.appendChild(makeCard(r)));
+
+  } else {
+    // --- CARDS VIEW (Todas) ---
+    tableSection.style.display = 'none';
+    cardsSection.style.display = nonBases.length ? 'block' : 'none';
+    basesSection.style.display = bases.length ? 'block' : 'none';
+
+    document.getElementById('recipesSectionLabel').textContent =
+      activeWeek === 'Todas' ? `Todas las recetas (${nonBases.length})` : 'Recetas';
+
+    const bg = document.getElementById('basesGrid');
+    bg.innerHTML = '';
+    bases.forEach(r => bg.appendChild(makeCard(r)));
+
+    const rg = document.getElementById('recipesGrid');
+    rg.innerHTML = '';
+    nonBases.forEach(r => rg.appendChild(makeCard(r)));
+  }
+}
+
+function makeCard(r) {
+  const cost = calcCostUnit(r);
+  const card = document.createElement('div');
+  card.className = 'recipe-card' + (r.isBase ? ' base' : '');
+  card.onclick = () => openModal(r.id, r.isBase);
+
+  let marginHtml = '';
+  if (!r.isBase && r.precio > 0) {
+    const totalCosto = cost + (r.comision || 0);
+    const ganancia = r.precio - totalCosto;
+    const pct = ((ganancia / r.precio) * 100).toFixed(1);
+    marginHtml = `<div class="card-margin">${pct}%</div>`;
+  }
+
+  card.innerHTML = `
+    <div class="card-brand">${r.brand}</div>
+    ${r.isBase ? '<div class="card-badge">Preparación base</div>' : ''}
+    <div class="card-name">${r.name}</div>
+    <div class="card-meta">Rinde: ${r.rinde} porciones · ${r.ingredients.length} ingredientes${r.bases.length ? ` · usa ${r.bases.length} base${r.bases.length>1?'s':''}` : ''}</div>
+    <div class="card-footer">
+      <div>
+        <div class="card-cost-label">Costo / porción</div>
+        <div class="card-cost">${fmt(cost)}</div>
+      </div>
+      ${r.precio > 0 ? `<div><div class="card-cost-label">Margen (venta ${fmt(r.precio)})</div>${marginHtml}</div>` : ''}
+    </div>
+  `;
+  return card;
+}
+
+function calcCostUnit(r) {
+  let total = 0;
+  (r.ingredients || []).forEach(ing => {
+    // Always use master price if available
+    const master = (state.ingredientesMaestros || []).find(m => m.name === ing.name);
+    const price = master ? master.price : (ing.pricePerUnit || 0);
+    total += (ing.qty || 0) * price;
+  });
+  (r.bases || []).forEach(b => {
+    const baseR = state.recipes.find(x => x.name === b.name && x.isBase);
+    if (baseR) {
+      const baseCostUnit = calcCostUnit(baseR);
+      if (b.unit === 'unidades') total += (b.qty || 0) * baseCostUnit;
+      else {
+        const baseTotal = baseCostUnit * baseR.rinde;
+        // approximate by portion
+        total += (baseCostUnit * b.qty / baseR.rinde);
+      }
+    }
+  });
+  return r.rinde > 0 ? total / r.rinde : 0;
+}
+
+// ---- BRAND ACTIONS ----
+function selectBrand(b) { activeBrand = b; activeWeek = 'Todas'; render(); }
+
+function addBrand() {
+  const name = prompt('Nombre de la nueva línea:');
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (state.brands.includes(n)) return alert('Ya existe esa línea.');
+  state.brands.push(n);
+  state.brandColors[n] = '#2D4A2E';
+  save(); activeBrand = n; render();
+}
+
+function editBrand() {
+  const name = prompt('Nuevo nombre para la línea:', activeBrand);
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (state.brands.includes(n) && n !== activeBrand) return alert('Ya existe ese nombre.');
+  const idx = state.brands.indexOf(activeBrand);
+  state.brands[idx] = n;
+  state.brandColors[n] = state.brandColors[activeBrand];
+  delete state.brandColors[activeBrand];
+  state.recipes.filter(r => r.brand === activeBrand).forEach(r => r.brand = n);
+  activeBrand = n;
+  save(); render();
+}
+
+function deleteBrand() {
+  if (!confirm(`¿Eliminar la línea "${activeBrand}" y todas sus recetas?`)) return;
+  state.recipes = state.recipes.filter(r => r.brand !== activeBrand);
+  state.brands = state.brands.filter(b => b !== activeBrand);
+  delete state.brandColors[activeBrand];
+  activeBrand = state.brands[0] || '';
+  save(); render();
+}
+
+function sortCards() {
+  state.recipes.sort((a,b) => a.name.localeCompare(b.name));
+  save(); render();
+}
+
+// ---- MODAL ----
+function openModal(id, isBase) {
+  editingId = id;
+  ingredientCount = 0;
+  baseCount = 0;
+
+  // populate brand select
+  const sel = document.getElementById('mBrand');
+  sel.innerHTML = state.brands.map(b => `<option value="${b}" ${b===activeBrand?'selected':''}>${b}</option>`).join('');
+  // pre-select current week in notes if new recipe
+  if (!id) {
+    const weekLabel = activeWeek !== 'Todas' ? activeWeek : 'Semana 1';
+    document.getElementById('mNotes').value = weekLabel + ' · Lunes. ';
+  }
+
+  if (id) {
+    const r = state.recipes.find(x => x.id === id);
+    document.getElementById('modalTitle').textContent = 'Editar receta';
+    document.getElementById('mName').value = r.name;
+    document.getElementById('mIsBase').checked = r.isBase;
+    document.getElementById('mRinde').value = r.rinde;
+    document.getElementById('mNotes').value = r.notes || '';
+    document.getElementById('mPrecio').value = r.precio || '';
+    document.getElementById('mComision').value = r.comision || 0;
+    sel.value = r.brand;
+
+    document.getElementById('ingredientsList').innerHTML = '';
+    r.ingredients.forEach(ing => addIngredient(ing));
+
+    document.getElementById('basesList').innerHTML = '';
+    (r.bases || []).forEach(b => addBase(b));
+  } else {
+    document.getElementById('modalTitle').textContent = isBase ? 'Nueva preparación base' : 'Nueva receta';
+    document.getElementById('mName').value = '';
+    document.getElementById('mIsBase').checked = isBase || false;
+    document.getElementById('mRinde').value = 10;
+    document.getElementById('mNotes').value = '';
+    document.getElementById('mPrecio').value = '';
+    document.getElementById('mComision').value = 0;
+    document.getElementById('ingredientsList').innerHTML = '';
+    document.getElementById('basesList').innerHTML = '';
+    addIngredient();
+  }
+  recalc();
+  document.getElementById('overlay').classList.add('open');
+  document.querySelector('.modal').scrollTop = 0;
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); editingId = null; }
+function closeOnOverlay(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+
+function toggleBase() { recalc(); }
+
+function addIngredient(data) {
+  const i = ingredientCount++;
+  const list = document.getElementById('ingredientsList');
+  const row = document.createElement('div');
+  row.className = 'ingredient-row';
+  row.id = `ing-${i}`;
+
+  // Build master ingredient options
+  const masters = (state.ingredientesMaestros || []).sort((a,b) => a.name.localeCompare(b.name));
+  const masterOpts = masters.map(m =>
+    `<option value="${m.name}" data-unit="${m.unit}" data-price="${m.price}" ${data && data.name===m.name ? 'selected' : ''}>${m.name}</option>`
+  ).join('');
+
+  const selectedMaster = data ? masters.find(m => m.name === data.name) : null;
+  const unit = data ? data.unit : (selectedMaster ? selectedMaster.unit : 'por peso (kg)');
+  const price = data ? data.pricePerUnit : (selectedMaster ? selectedMaster.price : '');
+
+  const currentUnit = data ? data.unit : 'por peso (kg)';
+  const priceLabel = currentUnit === 'gramos' ? 'Gs./kg' : currentUnit === 'ml' ? 'Gs./litro' : currentUnit === 'por peso (kg)' ? 'Gs./kg' : currentUnit === 'por litro' ? 'Gs./litro' : 'Gs./un.';
+
+  row.innerHTML = `
+    <div style="position:relative; grid-column:1;">
+      <select class="form-input form-select" id="ing-name-${i}" onchange="onIngredientSelect(${i})" style="width:100%;">
+        <option value="">— Elegir ingrediente —</option>
+        ${masterOpts}
+      </select>
+    </div>
+    <select class="form-input form-select" id="ing-unit-${i}" onchange="onUnitChange(${i})">
+      <option value="por peso (kg)" ${currentUnit==='por peso (kg)'?'selected':''}>kg</option>
+      <option value="gramos" ${currentUnit==='gramos'?'selected':''}>gramos</option>
+      <option value="por unidad" ${currentUnit==='por unidad'?'selected':''}>unidad</option>
+      <option value="por litro" ${currentUnit==='por litro'?'selected':''}>litro</option>
+      <option value="ml" ${currentUnit==='ml'?'selected':''}>ml</option>
+    </select>
+    <input class="form-input" type="number" placeholder="Cantidad" id="ing-qty-${i}" value="${data ? data.qty : ''}" oninput="recalc()">
+    <div style="display:flex; align-items:center; gap:4px;">
+      <span id="ing-price-label-${i}" style="font-size:11px; color:var(--text-muted); white-space:nowrap;">${priceLabel}</span>
+      <input class="form-input" type="number" placeholder="Precio base" id="ing-price-${i}" value="${price}" oninput="recalc()" style="color:#2D4A2E; font-weight:600;">
+    </div>
+    <button class="btn-remove" onclick="document.getElementById('ing-${i}').remove();recalc()">Quitar</button>
+  `;
+  list.appendChild(row);
+  if (data) recalc();
+}
+
+function onIngredientSelect(i) {
+  const sel = document.getElementById(`ing-name-${i}`);
+  const opt = sel.options[sel.selectedIndex];
+  const masterName = opt.value;
+  const master = (state.ingredientesMaestros || []).find(m => m.name === masterName);
+  if (master) {
+    const unitSel = document.getElementById(`ing-unit-${i}`);
+    const priceInp = document.getElementById(`ing-price-${i}`);
+    // Set default unit from master
+    if (unitSel) {
+      const masterUnit = master.unit === 'por peso (kg)' ? 'por peso (kg)'
+        : master.unit === 'por litro' ? 'por litro'
+        : 'por unidad';
+      for (let o of unitSel.options) { if (o.value === masterUnit) { o.selected = true; break; } }
+    }
+    if (priceInp) { priceInp.value = master.price; }
+  }
+  recalc();
+}
+
+function onUnitChange(i) {
+  // When unit changes, update the displayed price to match
+  const nameEl = document.getElementById(`ing-name-${i}`);
+  const name = nameEl?.value || '';
+  const master = (state.ingredientesMaestros || []).find(m => m.name === name);
+  const priceInp = document.getElementById(`ing-price-${i}`);
+  const unit = document.getElementById(`ing-unit-${i}`)?.value || '';
+  if (master && priceInp) {
+    // Always show the master base price (per kg or per liter)
+    // The conversion happens in recalc()
+    priceInp.value = master.price;
+  }
+  updatePriceLabel(i, unit);
+  recalc();
+}
+
+function updatePriceLabel(i, unit) {
+  const labelEl = document.getElementById(`ing-price-label-${i}`);
+  if (!labelEl) return;
+  if (unit === 'gramos') labelEl.textContent = 'Gs./kg';
+  else if (unit === 'ml') labelEl.textContent = 'Gs./litro';
+  else if (unit === 'por peso (kg)') labelEl.textContent = 'Gs./kg';
+  else if (unit === 'por litro') labelEl.textContent = 'Gs./litro';
+  else labelEl.textContent = 'Gs./un.';
+}
+
+function addBase(data) {
+  const i = baseCount++;
+  const list = document.getElementById('basesList');
+  const bases = state.recipes.filter(r => r.isBase);
+  const opts = bases.map(b => `<option value="${b.name}" ${data&&data.name===b.name?'selected':''}>${b.name}</option>`).join('');
+  const row = document.createElement('div');
+  row.className = 'base-row';
+  row.id = `base-${i}`;
+  row.innerHTML = `
+    <select class="form-input form-select" id="base-name-${i}" onchange="recalc()">${opts || '<option>Sin bases</option>'}</select>
+    <select class="form-input form-select" id="base-unit-${i}" onchange="recalc()">
+      <option ${data&&data.unit==='unidades'?'selected':''}>unidades</option>
+      <option ${data&&data.unit==='gramos'?'selected':''}>gramos</option>
+    </select>
+    <input class="form-input" type="number" placeholder="Cantidad" id="base-qty-${i}" value="${data ? data.qty : 1}" oninput="recalc()">
+    <span class="base-note" id="base-note-${i}"></span>
+    <span class="base-cost" id="base-cost-${i}">—</span>
+    <button class="btn-remove" onclick="document.getElementById('base-${i}').remove();recalc()">Quitar</button>
+  `;
+  list.appendChild(row);
+  recalc();
+}
+
+function setRinde(n) {
+  document.getElementById('mRinde').value = n;
+  recalc();
+}
+
+function recalc() {
+  const rinde = parseFloat(document.getElementById('mRinde').value) || 1;
+  let total = 0;
+  const compras = [];
+
+  // ingredients
+  for (let i = 0; i < ingredientCount; i++) {
+    const el = document.getElementById(`ing-${i}`);
+    if (!el) continue;
+    const nameEl = document.getElementById(`ing-name-${i}`);
+    const name = nameEl?.value || nameEl?.innerText || '';
+    if (!name || name === '— Elegir ingrediente —') continue;
+    const qty = parseFloat(document.getElementById(`ing-qty-${i}`)?.value) || 0;
+    const unit = document.getElementById(`ing-unit-${i}`)?.value || '';
+    // Use master price if available, fallback to field
+    const master = (state.ingredientesMaestros || []).find(m => m.name === name);
+    const pricePerKg = master ? master.price : (parseFloat(document.getElementById(`ing-price-${i}`)?.value) || 0);
+    // Keep price field in sync
+    const priceField = document.getElementById(`ing-price-${i}`);
+    if (priceField && master) priceField.value = master.price;
+    
+    // Convert quantity to base unit for cost calculation
+    let cost = 0;
+    if (unit === 'gramos') {
+      cost = (qty / 1000) * pricePerKg;  // qty in grams, price in Gs/kg → divide by 1000
+    } else if (unit === 'ml') {
+      cost = (qty / 1000) * pricePerKg;  // qty in ml, price in Gs/liter → divide by 1000
+    } else {
+      cost = qty * pricePerKg;  // kg, unidad, litro — multiply directly
+    }
+    // Show effective cost per gram/ml in price field for reference
+    const priceField2 = document.getElementById(`ing-price-${i}`);
+    if (priceField2 && master) priceField2.value = master.price;
+    total += cost;
+    if (name) compras.push({name, qty, unit, cost});
+  }
+
+  // bases
+  for (let i = 0; i < baseCount; i++) {
+    const el = document.getElementById(`base-${i}`);
+    if (!el) continue;
+    const bname = document.getElementById(`base-name-${i}`)?.value || '';
+    const bunit = document.getElementById(`base-unit-${i}`)?.value || '';
+    const bqty = parseFloat(document.getElementById(`base-qty-${i}`)?.value) || 0;
+    const baseR = state.recipes.find(x => x.name === bname && x.isBase);
+    let bcost = 0;
+    let note = '';
+    if (baseR) {
+      const baseCostUnit = calcCostUnit(baseR);
+      const baseTotalCost = baseCostUnit * baseR.rinde;
+      if (bunit === 'unidades') {
+        bcost = bqty * baseCostUnit;
+        note = `el lote de "${bname}" rinde ${baseR.rinde} porciones (${fmt(baseTotalCost)} total) — ${fmt(baseCostUnit)} por porción`;
+      } else {
+        bcost = baseCostUnit * bqty / baseR.rinde;
+        note = `usando ${bqty}g del lote de "${bname}"`;
+      }
+      total += bcost * rinde;
+    }
+    const noteEl = document.getElementById(`base-note-${i}`);
+    const costEl = document.getElementById(`base-cost-${i}`);
+    if (noteEl) noteEl.textContent = note;
+    if (costEl) costEl.textContent = fmt(bcost);
+  }
+
+  const costUnit = total / rinde;
+  document.getElementById('costUnit').textContent = fmt(costUnit);
+  document.getElementById('costTotal').textContent = fmt(total);
+  document.getElementById('comprasFor').textContent = rinde;
+
+  // margen
+  const precio = parseFloat(document.getElementById('mPrecio').value) || 0;
+  const otrosCostos = parseFloat(document.getElementById('mComision').value) || 0;
+  const totalCosto = costUnit + otrosCostos;
+  const ganancia = precio - totalCosto;
+  const pct = precio > 0 ? ((ganancia / precio) * 100).toFixed(1) : 0;
+  const margenEl = document.getElementById('margenInfo');
+  if (precio > 0) {
+    margenEl.innerHTML = otrosCostos > 0
+      ? `Costo ingredientes: <span class="margen-highlight">${fmt(costUnit)}</span> · Otros costos: <span class="margen-highlight">${fmt(otrosCostos)}</span> · Costo total: <span class="margen-highlight">${fmt(totalCosto)}</span><br>Ganancia por porción: <span class="margen-highlight">${fmt(ganancia)}</span> · Margen: <span class="margen-pct">${pct}%</span>`
+      : `Costo ingredientes: <span class="margen-highlight">${fmt(costUnit)}</span> · Ganancia: <span class="margen-highlight">${fmt(ganancia)}</span> · Margen: <span class="margen-pct">${pct}%</span>`;
+  } else {
+    margenEl.textContent = 'Ingresá un precio de venta para ver el margen.';
+  }
+
+  // compras
+  const cl = document.getElementById('comprasList');
+  cl.innerHTML = compras.map(c => {
+    let qtyLabel = '';
+    if (c.unit === 'gramos') qtyLabel = `${c.qty} g`;
+    else if (c.unit === 'ml') qtyLabel = `${c.qty} ml`;
+    else if (c.unit === 'por peso (kg)') qtyLabel = `${c.qty} kg`;
+    else if (c.unit === 'por litro') qtyLabel = `${c.qty} L`;
+    else if (c.unit === 'por unidad') qtyLabel = `${c.qty} un.`;
+    else qtyLabel = `${c.qty} ${c.unit}`;
+    return `
+    <div class="compra-row">
+      <span>${c.name}</span>
+      <span class="compra-qty">${qtyLabel}</span>
+      <span class="compra-cost">${fmt(c.cost)}</span>
+    </div>`;
+  }).join('') || '<div style="font-size:13px;color:var(--text-muted)">Sin ingredientes aún.</div>';
+}
+
+function saveRecipe() {
+  const name = document.getElementById('mName').value.trim();
+  if (!name) return alert('Ingresá el nombre del plato.');
+  const brand = document.getElementById('mBrand').value;
+  const isBase = document.getElementById('mIsBase').checked;
+  const rinde = parseFloat(document.getElementById('mRinde').value) || 1;
+  const notes = document.getElementById('mNotes').value;
+  const precio = parseFloat(document.getElementById('mPrecio').value) || 0;
+  const comision = parseFloat(document.getElementById('mComision').value) || 0;
+
+  const ingredients = [];
+  for (let i = 0; i < ingredientCount; i++) {
+    if (!document.getElementById(`ing-${i}`)) continue;
+    const nameEl = document.getElementById(`ing-name-${i}`);
+    const n = (nameEl?.value || '').trim();
+    if (!n || n === '— Elegir ingrediente —') continue;
+    const master = (state.ingredientesMaestros || []).find(m => m.name === n);
+    const ingUnit = document.getElementById(`ing-unit-${i}`)?.value || 'por peso (kg)';
+    const ingQty = parseFloat(document.getElementById(`ing-qty-${i}`)?.value) || 0;
+    ingredients.push({
+      name: n,
+      unit: ingUnit,
+      qty: ingQty,
+      pricePerUnit: master ? master.price : (parseFloat(document.getElementById(`ing-price-${i}`)?.value) || 0),
+    });
+  }
+
+  const bases = [];
+  for (let i = 0; i < baseCount; i++) {
+    if (!document.getElementById(`base-${i}`)) continue;
+    bases.push({
+      name: document.getElementById(`base-name-${i}`)?.value,
+      unit: document.getElementById(`base-unit-${i}`)?.value,
+      qty: parseFloat(document.getElementById(`base-qty-${i}`)?.value) || 0,
+    });
+  }
+
+  if (editingId) {
+    const r = state.recipes.find(x => x.id === editingId);
+    Object.assign(r, {name, brand, isBase, rinde, notes, precio, comision, ingredients, bases});
+  } else {
+    state.recipes.push({id: state.nextId++, name, brand, isBase, rinde, notes, precio, comision, ingredients, bases});
+  }
+
+  save(); closeModal(); render();
+}
+
+function deleteRecipe() {
+  if (!editingId) return;
+  if (!confirm('¿Eliminar esta receta?')) return;
+  state.recipes = state.recipes.filter(r => r.id !== editingId);
+  save(); closeModal(); render();
+}
+
+function printRecipe() { window.print(); }
+
+// ---- VISTA PRINCIPAL ----
+let currentView = 'recetas';
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('viewRecetas').style.display = v === 'recetas' ? 'block' : 'none';
+  document.getElementById('toolbarRecetas').style.display = v === 'recetas' ? 'block' : 'none';
+  document.getElementById('viewIngredientes').style.display = v === 'ingredientes' ? 'block' : 'none';
+  document.getElementById('navRecetas').classList.toggle('active', v === 'recetas');
+  document.getElementById('navIngredientes').classList.toggle('active', v === 'ingredientes');
+  if (v === 'ingredientes') renderIngredientes();
+  if (v === 'recetas') render();
+}
+
+// ---- INGREDIENTES MAESTROS ----
+function getMasterPrice(name) {
+  const ing = (state.ingredientesMaestros || []).find(i => i.name === name);
+  return ing ? ing.price : null;
+}
+
+function renderIngredientes() {
+  const query = (document.getElementById('ingSearch')?.value || '').toLowerCase();
+  const tbody = document.getElementById('ingredientesTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const list = (state.ingredientesMaestros || [])
+    .filter(i => !query || i.name.toLowerCase().includes(query))
+    .sort((a,b) => a.name.localeCompare(b.name));
+
+  list.forEach((ing, idx) => {
+    // Count how many recipes use this ingredient
+    const usedIn = state.recipes.filter(r =>
+      r.ingredients.some(i => i.name === ing.name)
+    ).length;
+
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border)';
+    tr.style.background = idx % 2 === 0 ? 'var(--white)' : 'var(--cream)';
+    tr.innerHTML = `
+      <td style="padding:13px 20px; font-size:15px; font-weight:500; color:#1A1A18;">${ing.name}</td>
+      <td style="padding:13px 20px;">
+        <select onchange="updateMasterUnit(${ing.id}, this.value)" style="border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; font-size:13px; background:var(--white); color:var(--text); font-family:'Jost',sans-serif; cursor:pointer;">
+          <option value="por peso (kg)" ${ing.unit==='por peso (kg)'?'selected':''}>precio por kg</option>
+          <option value="por unidad" ${ing.unit==='por unidad'?'selected':''}>precio por unidad</option>
+          <option value="por litro" ${ing.unit==='por litro'?'selected':''}>precio por litro</option>
+        </select>
+      </td>
+      <td style="padding:13px 20px; text-align:right;">
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+          <span style="font-size:13px; color:var(--text-muted);">Gs.</span>
+          <input
+            type="number"
+            value="${ing.price}"
+            onchange="updateMasterPrice(${ing.id}, this.value)"
+            style="width:110px; padding:7px 10px; border:1.5px solid var(--border); border-radius:8px; font-size:15px; font-weight:600; color:#2D4A2E; text-align:right; font-family:'Jost',sans-serif; background:var(--white);"
+          >
+        </div>
+      </td>
+      <td style="padding:13px 20px; text-align:center;">
+        ${usedIn > 0
+          ? `<button onclick="showRecipesWithIngredient('${ing.name.replace(/'/g,"\\'")}', event)"
+              style="display:inline-block; background:var(--green-light); color:#2D4A2E; border-radius:12px; padding:3px 14px; font-size:13px; font-weight:600; border:1.5px solid #8DC98A; cursor:pointer; font-family:'Jost',sans-serif;"
+              title="Ver recetas que usan este ingrediente">${usedIn} ver →</button>`
+          : `<span style="display:inline-block; background:var(--cream-dark); color:var(--text-muted); border-radius:12px; padding:3px 10px; font-size:13px;">0</span>`
+        }
+      </td>
+      <td style="padding:13px 20px; text-align:center;">
+        <button onclick="deleteMasterIngredient(${ing.id})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;" title="Eliminar">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:32px; text-align:center; color:var(--text-muted); font-size:14px;">No se encontraron ingredientes.</td></tr>`;
+  }
+}
+
+function updateMasterPrice(id, value) {
+  const ing = state.ingredientesMaestros.find(i => i.id === id);
+  if (!ing) return;
+  ing.price = parseFloat(value) || 0;
+  // Sync price to all recipes that use this ingredient
+  state.recipes.forEach(r => {
+    r.ingredients.forEach(i => {
+      if (i.name === ing.name) i.pricePerUnit = ing.price;
+    });
+  });
+  save();
+  // Flash confirmation
+  const input = event?.target;
+  if (input) { input.style.borderColor = '#4A8A47'; setTimeout(() => input.style.borderColor = 'var(--border)', 800); }
+}
+
+function updateMasterUnit(id, value) {
+  const ing = state.ingredientesMaestros.find(i => i.id === id);
+  if (!ing) return;
+  ing.unit = value;
+  state.recipes.forEach(r => {
+    r.ingredients.forEach(i => {
+      if (i.name === ing.name) i.unit = value;
+    });
+  });
+  save();
+}
+
+function showRecipesWithIngredient(ingName, event) {
+  event.stopPropagation();
+  // Remove existing popup
+  document.getElementById('ingPopup')?.remove();
+
+  const recipes = state.recipes.filter(r => r.ingredients.some(i => i.name === ingName));
+  const popup = document.createElement('div');
+  popup.id = 'ingPopup';
+  popup.style.cssText = `position:fixed; z-index:999; background:white; border:1.5px solid var(--border); border-radius:14px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:16px; min-width:280px; max-width:340px; font-family:'Jost',sans-serif;`;
+
+  // Position near button
+  const rect = event.target.getBoundingClientRect();
+  popup.style.top = (rect.bottom + 8) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 360) + 'px';
+
+  popup.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-size:13px; font-weight:600; color:#1A1A18;">Recetas con "${ingName}"</div>
+      <button onclick="document.getElementById('ingPopup').remove()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      ${recipes.map(r => `
+        <button onclick="document.getElementById('ingPopup').remove(); setView('recetas'); setTimeout(()=>openModal(${r.id}, ${r.isBase}),100);"
+          style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--cream); border:1.5px solid var(--border); border-radius:10px; cursor:pointer; font-family:'Jost',sans-serif; text-align:left; transition:all .15s;"
+          onmouseover="this.style.borderColor='#2D4A2E'" onmouseout="this.style.borderColor='var(--border)'">
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#1A1A18;">${r.name}</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${r.brand}</div>
+          </div>
+          <span style="font-size:12px; color:#2D4A2E; font-weight:600;">Abrir →</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+  // Close on outside click
+  setTimeout(() => document.addEventListener('click', function close(e) {
+    if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener('click', close); }
+  }), 100);
+}
+
+function addIngredienteMaestro() {
+  const name = prompt('Nombre del ingrediente:');
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (state.ingredientesMaestros.find(i => i.name === n)) {
+    alert('Ya existe ese ingrediente.');
+    return;
+  }
+  const maxId = Math.max(...state.ingredientesMaestros.map(i => i.id), 0);
+  state.ingredientesMaestros.push({ id: maxId + 1, name: n, unit: 'por peso (kg)', price: 0 });
+  save();
+  renderIngredientes();
+}
+
+function deleteMasterIngredient(id) {
+  const ing = state.ingredientesMaestros.find(i => i.id === id);
+  if (!ing) return;
+  const usedIn = state.recipes.filter(r => r.ingredients.some(i => i.name === ing.name)).length;
+  const msg = usedIn > 0
+    ? `"${ing.name}" se usa en ${usedIn} receta(s). ¿Eliminarlo del listado maestro?`
+    : `¿Eliminar "${ing.name}"?`;
+  if (!confirm(msg)) return;
+  state.ingredientesMaestros = state.ingredientesMaestros.filter(i => i.id !== id);
+  save();
+  renderIngredientes();
+}
+
+// ---- MOVER PLATOS ----
+let movingRecipeId = null;
+
+function openMoveModal(id) {
+  movingRecipeId = id;
+  const r = state.recipes.find(x => x.id === id);
+  if (!r) return;
+
+  document.getElementById('movePlateName').textContent = r.name;
+  document.getElementById('moveOverlay').style.display = 'flex';
+
+  // Pre-select current week/day
+  const currentWeek = (['Semana 1','Semana 2','Semana 3','Semana 4']).find(w => (r.notes||'').includes(w)) || 'Semana 1';
+  const currentDay = DAYS.find(d => (r.notes||'').includes(d)) || 'Lunes';
+  document.getElementById('moveWeek').value = currentWeek;
+  document.getElementById('moveDay').value = currentDay;
+
+  updateMovePreview();
+  document.getElementById('moveWeek').onchange = updateMovePreview;
+  document.getElementById('moveDay').onchange = updateMovePreview;
+}
+
+function updateMovePreview() {
+  const r = state.recipes.find(x => x.id === movingRecipeId);
+  if (!r) return;
+
+  const targetWeek = document.getElementById('moveWeek').value;
+  const targetDay = document.getElementById('moveDay').value;
+
+  // Check if there's already a recipe in that slot
+  const conflict = state.recipes.find(x =>
+    x.brand === r.brand &&
+    (x.notes||'').includes(targetWeek) &&
+    (x.notes||'').includes(targetDay) &&
+    x.id !== movingRecipeId
+  );
+
+  const conflictMsg = document.getElementById('moveConflictMsg');
+  const preview = document.getElementById('movePreview');
+
+  if (conflict) {
+    conflictMsg.style.display = 'block';
+    conflictMsg.innerHTML = `⚠️ <strong>${conflict.name}</strong> ya está ese día. Se van a intercambiar los dos platos.`;
+    preview.innerHTML = `↔️ <strong>${r.name}</strong> va a <strong>${targetWeek} · ${targetDay}</strong><br>↔️ <strong>${conflict.name}</strong> va al lugar actual de ${r.name}`;
+  } else {
+    conflictMsg.style.display = 'none';
+    preview.innerHTML = `✓ <strong>${r.name}</strong> se mueve a <strong>${targetWeek} · ${targetDay}</strong>`;
+  }
+}
+
+function confirmMove() {
+  const r = state.recipes.find(x => x.id === movingRecipeId);
+  if (!r) return;
+
+  const targetWeek = document.getElementById('moveWeek').value;
+  const targetDay = document.getElementById('moveDay').value;
+
+  // Get current week/day of recipe being moved
+  const currentWeek = (['Semana 1','Semana 2','Semana 3','Semana 4']).find(w => (r.notes||'').includes(w)) || '';
+  const currentDay = DAYS.find(d => (r.notes||'').includes(d)) || '';
+
+  // Check for conflict — swap if needed
+  const conflict = state.recipes.find(x =>
+    x.brand === r.brand &&
+    (x.notes||'').includes(targetWeek) &&
+    (x.notes||'').includes(targetDay) &&
+    x.id !== movingRecipeId
+  );
+
+  if (conflict && currentWeek && currentDay) {
+    // Swap: move conflict to current slot
+    conflict.notes = (conflict.notes||'')
+      .replace(targetWeek, currentWeek)
+      .replace(targetDay, currentDay);
+  }
+
+  // Move r to target slot
+  r.notes = (r.notes||'')
+    .replace(currentWeek, targetWeek)
+    .replace(currentDay, targetDay);
+
+  save();
+  closeMoveModal();
+  render();
+}
+
+function closeMoveModal(e) {
+  if (e && e.target !== document.getElementById('moveOverlay')) return;
+  document.getElementById('moveOverlay').style.display = 'none';
+  movingRecipeId = null;
+}
+
+// ---- INIT ----
+// Start with default state rendered, then Firebase loads real data
+render();
+initFirebase();
+</script>
+</body>
+</html>
